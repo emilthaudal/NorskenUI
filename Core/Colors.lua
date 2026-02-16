@@ -60,21 +60,27 @@ end
 -- GetClassColorHex
 -- Get class color hex code for text coloring
 function NRSKNUI:GetClassColorHex(classToken)
-    if not classToken then
-        local _, class = UnitClass("player")
-        classToken = class
+    -- Validate classToken is a string before using as table key
+    if type(classToken) == "string" then
+        local hex = self.ClassColorHex[classToken]
+        if hex then return hex end
     end
-    return self.ClassColorHex[classToken] or "FFFFFF"
+    -- Fallback to player class
+    local _, class = UnitClass("player")
+    return self.ClassColorHex[class] or "FFFFFF"
 end
 
 -- GetClassColorRaw
 -- Get RAID_CLASS_COLORS entry for a class token
 function NRSKNUI:GetClassColorRaw(classToken)
-    if not classToken then
-        local _, class = UnitClass("player")
-        classToken = class
+    -- Validate classToken is a string before using as table key
+    if type(classToken) == "string" then
+        local color = RAID_CLASS_COLORS[classToken]
+        if color then return color end
     end
-    return RAID_CLASS_COLORS[classToken]
+    -- Fallback to player class
+    local _, class = UnitClass("player")
+    return RAID_CLASS_COLORS[class]
 end
 
 -- ColorTextByClass
