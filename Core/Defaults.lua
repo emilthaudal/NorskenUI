@@ -48,14 +48,14 @@ local Defaults = {
         CombatTimer = {
             Enabled = true,                      -- Enable/disable combat timer
             Format = "MM:SS",                    -- Time format
-            FontSize = 22,                       -- Font size
+            FontSize = 28,                       -- Font size
             FontFace = "Expressway",             -- Font face
             FontOutline = "SOFTOUTLINE",         -- Font outline
             FontShadow = {                       -- Font shadow settings
                 Enabled = false,                 -- Enable font shadow
                 OffsetX = 0,                     -- X offset
                 OffsetY = 0,                     -- Y offset
-                Color = { 0, 0, 0, 1 },          -- Shadow color (alpha 1 when enabled)
+                Color = { 0, 0, 0, 0 },          -- Shadow color (alpha 1 when enabled)
             },
             ColorInCombat = { 1, 1, 1, 1 },      -- Color when in combat
             ColorOutOfCombat = { 1, 1, 1, 0.7 }, -- Color when out of combat
@@ -86,7 +86,7 @@ local Defaults = {
             anchorFrameType = "UIPARENT", -- Anchor frame type (SCREEN, UIPARENT, SELECTFRAME)
             ParentFrame = "UIParent",     -- Parent frame name (when SELECTFRAME)
             FontFace = "Expressway",      -- Font face
-            FontSize = 15,                -- Font size
+            FontSize = 16,                -- Font size
             FontOutline = "SOFTOUTLINE",  -- Font outline: NONE, OUTLINE, THICKOUTLINE, SOFTOUTLINE
             FontShadow = {                -- Font shadow settings (disabled when SOFTOUTLINE)
                 Enabled = false,          -- Enable font shadow
@@ -98,7 +98,7 @@ local Defaults = {
                 AnchorFrom = "CENTER",    -- Anchor point from
                 AnchorTo = "CENTER",      -- Anchor point to
                 XOffset = 0,              -- X offset
-                YOffset = 142,            -- Y offset
+                YOffset = 172,            -- Y offset
             },
             Duration = 2.5,               -- Message display duration
             Spacing = 4,                  -- Vertical spacing between messages
@@ -195,12 +195,12 @@ local Defaults = {
 
                 -- Backdrop Settings
                 Backdrop = {                      -- Backdrop settings (text mode mainly)
-                    Enabled = false,              -- Enable backdrop
-                    Color = { 0, 0, 0, 0.6 },     -- Background color
+                    Enabled = true,               -- Enable backdrop
+                    Color = { 0, 0, 0, 0.8 },     -- Background color
                     BorderColor = { 0, 0, 0, 1 }, -- Border color
                     PaddingX = 8,                 -- Horizontal padding (visual only, not used for sizing)
                     PaddingY = 4,                 -- Vertical padding (visual only, not used for sizing)
-                    FrameWidth = 100,             -- Fixed frame width
+                    FrameWidth = 112,             -- Fixed frame width
                     FrameHeight = 26,             -- Fixed frame height
                 },
                 GrowthDirection = "RIGHT",        -- Growth direction: "LEFT", "RIGHT", "CENTER"
@@ -219,7 +219,7 @@ local Defaults = {
             DeadColor = { 1, 0.2, 0.2, 1 },    -- Red for dead
             -- Font settings
             FontFace = "Expressway",           -- Font face
-            FontSize = 24,                     -- Font size
+            FontSize = 25,                     -- Font size
             FontOutline = "SOFTOUTLINE",       -- Font outline (NONE, OUTLINE, THICKOUTLINE, SOFTOUTLINE)
             -- Position settings
             Strata = "HIGH",                   -- Frame strata
@@ -229,7 +229,7 @@ local Defaults = {
                 AnchorFrom = "CENTER",         -- Anchor point from
                 AnchorTo = "CENTER",           -- Anchor point to
                 XOffset = 0,                   -- X offset
-                YOffset = 181,                 -- Y offset
+                YOffset = 105,                 -- Y offset
             },
         },
 
@@ -240,7 +240,7 @@ local Defaults = {
                 Color = { 0, 1, 0 },
                 -- Font settings
                 FontFace = "Expressway",      -- Font face
-                FontSize = 24,                -- Font size
+                FontSize = 36,                -- Font size
                 FontOutline = "SOFTOUTLINE",  -- Font outline (NONE, OUTLINE, THICKOUTLINE)
                 -- Position settings
                 Strata = "HIGH",              -- Frame strata
@@ -250,7 +250,7 @@ local Defaults = {
                     AnchorFrom = "CENTER",    -- Anchor point from
                     AnchorTo = "CENTER",      -- Anchor point to
                     XOffset = 0,              -- X offset
-                    YOffset = 300,            -- Y offset
+                    YOffset = -319,           -- Y offset
                 },
             },
 
@@ -450,6 +450,14 @@ local Defaults = {
                     ReadyColor = { 0.623, 0.749, 1, 1 },
                     NotReadyColor = { 0.5, 0.5, 0.5, 1 },
                     TickColor = { 0.1, 0.8, 0.1, 1 },
+                },
+
+                -- Target Names
+                TargetNames = {
+                    Anchor = "CENTER",
+                    XOffset = 0,
+                    YOffset = 4,
+                    FontSize = 10,
                 },
             },
 
@@ -1357,7 +1365,7 @@ local Defaults = {
         -- Missing Buffs Tracker
         MissingBuffs = {
             -- General Settings
-            Enabled = true,              -- Enable/disable module
+            Enabled = true, -- Enable/disable module
             -- Consumable Tracking
             Consumables = {
                 Flask = { Enabled = true, LoadCondition = "ANYGROUP" },
@@ -1371,17 +1379,17 @@ local Defaults = {
             RaidBuffDisplay = {
                 IconSize = 48,
                 IconSpacing = 1,
-                FontFace = "Expressway",                 -- Font face
-                FontSize = 12,                           -- Font size
-                FontOutline = "SOFTOUTLINE",             -- Font outline
+                FontFace = "Expressway",     -- Font face
+                FontSize = 20,               -- Font size
+                FontOutline = "SOFTOUTLINE", -- Font outline
                 Strata = "HIGH",
                 anchorFrameType = "UIPARENT",
                 ParentFrame = "UIParent",
                 Position = {
                     AnchorFrom = "CENTER",
                     AnchorTo = "CENTER",
-                    XOffset = 0.1,
-                    YOffset = -375.1,
+                    XOffset = 0,
+                    YOffset = -380,
                 },
             },
             -- Stance & Spec Buff Settings
@@ -1447,9 +1455,9 @@ local Defaults = {
             -- Stance Display Settings (separate position)
             StanceDisplay = {
                 Enabled = true,              -- Enable stance text display
-                IconSize = 38,
+                IconSize = 36,
                 FontFace = "Expressway",     -- Font face
-                FontSize = 12,               -- Font size
+                FontSize = 13,               -- Font size
                 FontOutline = "SOFTOUTLINE", -- Font outline
                 Strata = "HIGH",
                 anchorFrameType = "UIPARENT",
@@ -1458,7 +1466,7 @@ local Defaults = {
                     AnchorFrom = "CENTER",
                     AnchorTo = "CENTER",
                     XOffset = 0,
-                    YOffset = -150,
+                    YOffset = -110,
                 },
             },
 
