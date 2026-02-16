@@ -125,7 +125,7 @@ function CHAT:CreateChatBackDrop()
     local backdropEnabled = db.Backdrop and db.Backdrop.Enabled ~= false
     local posDB = db.Position
 
-    local backdrop = CreateFrame("Frame", "ChatBackdrop", UIParent, "BackdropTemplate")
+    local backdrop = CreateFrame("Frame", "NRSKNUI_ChatBackdrop", UIParent, "BackdropTemplate")
     backdrop:SetWidth(db.Width)
     backdrop:SetHeight(db.Height)
     backdrop:SetPoint(posDB.AnchorFrom, UIParent, posDB.AnchorTo, posDB.XOffset, posDB.YOffset)

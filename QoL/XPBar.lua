@@ -115,7 +115,7 @@ function XPBar:CreateBar()
     local r, g, b, a = self:GetColor()
     local statusbar = NRSKNUI:GetStatusbarPath(self.db.StatusBarTexture or "NorskenUI")
 
-    local bar = CreateFrame("StatusBar", "NorskenUI_XPBar", UIParent)
+    local bar = CreateFrame("StatusBar", "NRSKNUI_XPBar", UIParent)
     bar:SetSize(self.db.width, self.db.height)
     bar:SetStatusBarTexture(statusbar)
     bar:GetStatusBarTexture():SetDrawLayer("ARTWORK")

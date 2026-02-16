@@ -565,7 +565,7 @@ end
 
 -- Create our own anchor frame that we later use to anchor tooltip to
 function TT:CreateTooltipAnchorFrame()
-    local TTAnchor = CreateFrame("Frame", "TT_AnchorFrame", UIParent)
+    local TTAnchor = CreateFrame("Frame", "NRSKNUI_ToolTipAnchorFrame", UIParent)
     TTAnchor:SetSize(170, 60)
     TTAnchor:ClearAllPoints()
     TTAnchor:SetPoint(self.db.Position.AnchorFrom, UIParent, self.db.Position.AnchorTo, self.db.Position.XOffset,

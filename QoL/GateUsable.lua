@@ -125,7 +125,7 @@ end
 function GATE:CreateAlertFrame()
     if self.alertFrame then return end
 
-    local frame = NRSKNUI:CreateTextFrame(UIParent, 300, 40)
+    local frame = NRSKNUI:CreateTextFrame(UIParent, 300, 40, { name = "NRSKNUI_GatewayAlert", })
     frame:Hide()
 
     self.alertFrame = frame

@@ -147,7 +147,7 @@ function DBG:CreateBackdropOne()
     DetailsBase1 = _G["DetailsBaseFrame1"]
     DetailsWindow1 = _G["Details_WindowFrame1"]
 
-    local backdrop = CreateFrame("Frame", "DetailsBgOne", UIParent, "BackdropTemplate")
+    local backdrop = CreateFrame("Frame", "NRSKNUI_DetailsBgOne", UIParent, "BackdropTemplate")
     backdrop:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
     })
@@ -288,7 +288,7 @@ function DBG:CreateBackdropTwo()
     DetailsBase2 = _G["DetailsBaseFrame2"]
     DetailsWindow2 = _G["Details_WindowFrame2"]
 
-    local backdrop = CreateFrame("Frame", "DetailsBgTwo", UIParent, "BackdropTemplate")
+    local backdrop = CreateFrame("Frame", "NRSKNUI_DetailsBgTwo", UIParent, "BackdropTemplate")
     backdrop:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
     })

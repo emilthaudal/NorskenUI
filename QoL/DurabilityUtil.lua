@@ -91,7 +91,7 @@ end
 function DUR:Create()
     if self.Frame then return end
 
-    local Frame = CreateFrame("Frame", nil, UIParent)
+    local Frame = CreateFrame("Frame", "NRSKNUI_DurabilityDataText", UIParent)
     Frame:SetSize(160, 14)
 
     local Text = Frame:CreateFontString(nil, "OVERLAY")
@@ -142,7 +142,7 @@ function DUR:CreateWarning()
     if self.WarningFrame then return end
     local color = self.db.WarningText.WarningColor
 
-    local WarningFrame = CreateFrame("Frame", nil, UIParent)
+    local WarningFrame = CreateFrame("Frame", "NRSKNUI_DurabilityWarning", UIParent)
     local WarningText = WarningFrame:CreateFontString(nil, "OVERLAY")
     WarningText:SetPoint("CENTER")
 

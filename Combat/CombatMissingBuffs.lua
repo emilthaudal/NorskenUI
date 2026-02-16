@@ -495,7 +495,7 @@ end
 local function CreateContainerFrame()
     if containerFrame then return end
     local raidDb = MBUFFS.db.RaidBuffDisplay
-    containerFrame = CreateFrame("Frame", "NorskenUI_MissingBuffContainer", UIParent)
+    containerFrame = CreateFrame("Frame", "NRSKNUI_MissingBuffContainer", UIParent)
     containerFrame:SetSize(400, raidDb.IconSize)
     NRSKNUI:ApplyFramePosition(containerFrame, raidDb.Position, raidDb)
     containerFrame:Hide()
@@ -507,7 +507,7 @@ local function CreateStanceFrame()
     local stanceDb = MBUFFS.db.StanceDisplay
 
     stanceFrame = NRSKNUI:CreateIconFrame(UIParent, stanceDb.IconSize, {
-        name = "NorskenUI_MissingStanceIcon",
+        name = "NRSKNUI_MissingStanceIcon",
     })
 
     -- Position text above the icon
@@ -527,7 +527,7 @@ local function CreateStanceTextFrame()
 
     -- Create frame using helper
     stanceTextFrame = NRSKNUI:CreateTextFrame(UIParent, 200, 30, {
-        name = "NorskenUI_StanceTextDisplay",
+        name = "NRSKNUI_StanceTextDisplay",
     })
 
     -- Apply position and font settings
