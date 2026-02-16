@@ -90,10 +90,6 @@ local function SetupSlashCommands()
             if NRSKNUI.EditMode then
                 NRSKNUI.EditMode:Toggle()
             end
-        elseif msg == "lock" then
-            if NRSKNUI.EditMode and NRSKNUI.EditMode:IsActive() then
-                NRSKNUI.EditMode:Exit()
-            end
         end
     end
     NRSKNUI:Print(NRSKNUI:ColorTextByTheme("/nui") .. " to open the configuration window.")
