@@ -297,6 +297,82 @@ local function UnitHasBuff(unit, spellId, extraSpellIds)
     return hasBuff
 end
 
+-- Helper to get buff-providing classes present in the group
+local function GetGroupBuffClasses()
+    local classesInGroup = {}
+    local groupSize = GetNumGroupMembers()
+
+    -- Solo, only check player's own class
+    if groupSize == 0 then
+        if playerClass then
+            classesInGroup[playerClass] = true
+        end
+        return classesInGroup
+    end
+
+    if IsInRaid() then
+        for i = 1, groupSize do
+            local unit = UNIT_STRINGS.raid[i]
+            if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
+                local _, class = UnitClass(unit)
+                if class and CLASS_BUFFS[class] then
+                    classesInGroup[class] = true
+                end
+            end
+        end
+    else
+        -- Check player
+        if playerClass then
+            classesInGroup[playerClass] = true
+        end
+        -- Check party members
+        for i = 1, groupSize - 1 do
+            local unit = UNIT_STRINGS.party[i]
+            if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
+                local _, class = UnitClass(unit)
+                if class and CLASS_BUFFS[class] then
+                    classesInGroup[class] = true
+                end
+            end
+        end
+    end
+
+    return classesInGroup
+end
+
+-- Check if player is missing a raid buff that someone in group can provide
+local function CheckMissingRaidBuffsFromGroup()
+    local missing = {}
+    local groupSize = GetNumGroupMembers()
+
+    -- Only check when in a group
+    if groupSize == 0 then return missing end
+
+    local classesInGroup = GetGroupBuffClasses()
+
+    -- Check each class's buffs
+    for class, _ in pairs(classesInGroup) do
+        -- Skip player's own class buffs
+        if class ~= playerClass then
+            local classBuffs = CLASS_BUFFS[class]
+            if classBuffs then
+                for _, buff in ipairs(classBuffs) do
+                    -- Check if player is missing this buff
+                    local hasBuff = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
+                    if not hasBuff then
+                        missing[#missing + 1] = {
+                            buff = buff,
+                            text = GENERALBUFF_TEXT,
+                        }
+                    end
+                end
+            end
+        end
+    end
+
+    return missing
+end
+
 -- Check buff status
 local function CheckBuffStatus(buff)
     if InCombatLockdown() then return false, false end
@@ -984,32 +1060,50 @@ local function CheckForMissingBuffs()
     local raidBuffsSettings = consumablesDb.RaidBuffs or {}
     local raidBuffsEnabled = raidBuffsSettings.Enabled ~= false
     local raidBuffsLoadMet = IsLoadConditionMet(raidBuffsSettings.LoadCondition)
-    if playerBuffs and raidBuffsEnabled and raidBuffsLoadMet then
-        for _, buff in ipairs(playerBuffs) do
-            local spellToCheck = buff.spellbookId or buff.spellId
-            if IsSpellKnown(spellToCheck) then
-                local specOk = true
-                if buff.specIds then
-                    specOk = false
-                    local spec = GetSpecialization()
-                    if spec then
-                        local specId = GetSpecializationInfo(spec)
-                        for _, id in ipairs(buff.specIds) do
-                            if specId == id then
-                                specOk = true
-                                break
+    if raidBuffsEnabled and raidBuffsLoadMet then
+        -- Track which buff spellIds we've already added to avoid duplicates
+        local addedBuffs = {}
+
+        -- First check player's own class buffs
+        if playerBuffs then
+            for _, buff in ipairs(playerBuffs) do
+                local spellToCheck = buff.spellbookId or buff.spellId
+                if IsSpellKnown(spellToCheck) then
+                    local specOk = true
+                    if buff.specIds then
+                        specOk = false
+                        local spec = GetSpecialization()
+                        if spec then
+                            local specId = GetSpecializationInfo(spec)
+                            for _, id in ipairs(buff.specIds) do
+                                if specId == id then
+                                    specOk = true
+                                    break
+                                end
                             end
                         end
                     end
-                end
-                if specOk then
-                    local isMissing, needsReapply = CheckBuffStatus(buff)
-                    if isMissing then
-                        currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = GENERALBUFF_TEXT }
-                    elseif needsReapply then
-                        currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = REAPPLY_TEXT }
+                    if specOk then
+                        local isMissing, needsReapply = CheckBuffStatus(buff)
+                        if isMissing then
+                            currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = GENERALBUFF_TEXT }
+                            addedBuffs[buff.spellId] = true
+                        elseif needsReapply then
+                            currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = REAPPLY_TEXT }
+                            addedBuffs[buff.spellId] = true
+                        end
                     end
                 end
+            end
+        end
+
+        -- Then check if player is missing buffs from other classes in the group
+        local groupMissing = CheckMissingRaidBuffsFromGroup()
+        for _, entry in ipairs(groupMissing) do
+            -- Only add if we haven't already added this buff
+            if not addedBuffs[entry.buff.spellId] then
+                currentMissingBuffs[#currentMissingBuffs + 1] = entry
+                addedBuffs[entry.buff.spellId] = true
             end
         end
     end
