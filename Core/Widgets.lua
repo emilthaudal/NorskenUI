@@ -1,4 +1,5 @@
 local _, NRSKNUI = ...
+local Theme = NRSKNUI.Theme
 
 local CreateFrame = CreateFrame
 local unpack = unpack
@@ -182,4 +183,163 @@ function NRSKNUI:CreateStandardBackdrop(parent, name, frameLevel, bgColor, borde
     end
 
     return backdrop
+end
+
+-- Create a button frame with backdrop, borders, and texture support
+-- Example usage:
+--[[
+local button = NRSKNUI:CreateButtonFrame(parent, width, height, btnName, {
+    name = "MyButton",
+    bgColor = {0.1, 0.1, 0.1, 0.9},
+    borderColor = {0, 0, 0, 1},
+    highlightColor = {1, 1, 1, 0.1},
+    pushedColor = {1, 1, 1, 0.05},
+    text = true,
+    textPoint = "CENTER",
+    textOffset = {0, 0},
+    icon = true,
+    iconPoint = "LEFT",
+    iconOffset = {4, 0},
+    iconSize = 16,
+})
+
+button:SetButtonText("Click Me")
+button:SetButtonIcon(texturePath)
+button:SetBackgroundColor(r, g, b, a)
+button:SetBorderColor(r, g, b, a)
+button:SetHighlightColor(r, g, b, a)
+button:SetTextColor(r, g, b, a)
+]]
+function NRSKNUI:CreateButtonFrame(parent, width, height, btnName, options)
+    -- Crate config, has defaults for all options to simplify usage when only a few custom settings are needed
+    options = options or {}
+    local name = btnName
+    local bgColor = options.bgColor or { 0, 0, 0, 0.8 }
+    local borderColor = options.borderColor or { 0, 0, 0, 1 }
+    local borderHighlightColor = options.borderHighlightColor or { Theme.accent[1], Theme.accent[2], Theme.accent[3], 1 }
+    local highlightColor = options.highlightColor or { 1, 1, 1, 0.1 }
+    local pushedColor = options.pushedColor or { 1, 1, 1, 0.05 }
+
+    -- Button positioning
+    local btnPoint = options.btnPoint or "CENTER"
+    local btnOffset = options.btnOffset or { 0, 0 }
+
+    -- Text positioning
+    local textPoint = options.textPoint or "CENTER"
+    local textOffset = options.textOffset or { 0, 0 }
+
+    local button = CreateFrame("Button", name, parent, "BackdropTemplate")
+    button:SetSize(width, height)
+    button:SetPoint(btnPoint, parent, btnPoint, btnOffset[1], btnOffset[2])
+
+    -- Backdrop background
+    button:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8" })
+    button:SetBackdropColor(unpack(bgColor))
+    button._bgColor = bgColor
+
+    -- Add borders
+    self:AddBorders(button, borderColor)
+
+    -- Highlight texture
+    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    button.highlight:SetAllPoints(button)
+    button.highlight:SetColorTexture(unpack(highlightColor))
+    button.highlight:SetBlendMode("ADD")
+
+    -- Pushed texture
+    button.pushed = button:CreateTexture(nil, "ARTWORK", nil, 1)
+    button.pushed:SetAllPoints(button)
+    button.pushed:SetColorTexture(unpack(pushedColor))
+    button.pushed:Hide()
+
+    -- Text
+    if options.text then
+        local shadowSettings = {}
+        button.text = button:CreateFontString(nil, "OVERLAY")
+        button.text:SetPoint(textPoint, button, textPoint, textOffset[1], textOffset[2])
+        button.text:SetTextColor(1, 1, 1, 1)
+        NRSKNUI:ApplyFontToText(button.text, "Expressway", 17, "SOFTOUTLINE", shadowSettings)
+    end
+
+    -- icon
+    if options.icon then
+        local iconPoint = options.iconPoint or "LEFT"
+        local iconOffset = options.iconOffset or { 4, 0 }
+        local iconSize = options.iconSize or 16
+
+        button.icon = button:CreateTexture(nil, "ARTWORK")
+        button.icon:SetSize(iconSize, iconSize)
+        button.icon:SetPoint(iconPoint, button, iconPoint, iconOffset[1], iconOffset[2])
+
+        if options.iconZoom then
+            self:ApplyZoom(button.icon, options.iconZoom)
+        end
+    end
+
+    -- Push/release visual feedback
+    button:SetScript("OnMouseDown", function(self)
+        if self:IsEnabled() then
+            self.pushed:Show()
+        end
+    end)
+
+    button:SetScript("OnMouseUp", function(self)
+        self.pushed:Hide()
+    end)
+
+    button:SetScript("OnEnter", function(self)
+        if self:IsEnabled() then
+            self.highlight:Show()
+            if borderHighlightColor then
+                self:SetBorderColor(unpack(borderHighlightColor))
+            end
+        end
+    end)
+
+    button:SetScript("OnLeave", function(self)
+        self.highlight:Hide()
+        if borderHighlightColor then
+            self:SetBorderColor(unpack(borderColor))
+        end
+    end)
+
+    -- Helper methods
+    function button:SetButtonText(text)
+        self.text:SetText(text)
+    end
+
+    function button:SetButtonIcon(texture)
+        if self.icon then
+            self.icon:SetTexture(texture)
+        end
+    end
+
+    function button:SetBackgroundColor(r, g, b, a)
+        self:SetBackdropColor(r, g, b, a)
+        self._bgColor = { r, g, b, a }
+    end
+
+    function button:SetHighlightColor(r, g, b, a)
+        self.highlight:SetColorTexture(r, g, b, a or 1)
+    end
+
+    function button:SetPushedColor(r, g, b, a)
+        self.pushed:SetColorTexture(r, g, b, a or 1)
+    end
+
+    function button:SetTextColor(r, g, b, a)
+        self.text:SetTextColor(r, g, b, a or 1)
+    end
+
+    function button:SetDisabledState(disabled)
+        if disabled then
+            self:Disable()
+            self:SetAlpha(0.5)
+        else
+            self:Enable()
+            self:SetAlpha(1)
+        end
+    end
+
+    return button
 end
