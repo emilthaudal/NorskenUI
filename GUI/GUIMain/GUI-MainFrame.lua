@@ -74,10 +74,21 @@ GUIFrame.SidebarConfig = {
             }
         },
         {
+            id = "cdm_section",
+            type = "header",
+            text = "• CDM Enhancements",
+            defaultExpanded = true,
+            items = {
+                { id = "CDM",     text = "Aura Overlay & Fonts" },
+                { id = "CDMGlow", text = "Hide Proc Animation" },
+            }
+        },
+        {
             id = "skinning_section",
             type = "header",
             text = "• Skinning",
             defaultExpanded = true,
+            elvUIDisabled = true,
             items = {
                 { id = "UICleanup",         text = "General UI Cleanup" },
                 { id = "Auras",             text = "Buffs, Debuffs & Externals" },
@@ -89,16 +100,6 @@ GUIFrame.SidebarConfig = {
                 { id = "messages",          text = "Blizzard Texts" },
                 { id = "tooltips",          text = "Tooltips" },
                 { id = "DetailsBackdrop",   text = "Details Backdrop" },
-            }
-        },
-        {
-            id = "cdm_section",
-            type = "header",
-            text = "• CDM Enhancements",
-            defaultExpanded = true,
-            items = {
-                { id = "CDM",     text = "Aura Overlay & Fonts" },
-                { id = "CDMGlow", text = "Hide Proc Animation" },
             }
         },
     },

@@ -85,7 +85,7 @@ GUIFrame:RegisterContent("HomePage", function(scrollChild, yOffset)
     local ElvUIDB = NRSKNUI.db.profile.UseElvUI
 
     -- Enable Checkbox
-    local ElvUIrow = GUIFrame:CreateRow(ElvUIcard.content, 36)
+    local ElvUIrow = GUIFrame:CreateRow(ElvUIcard.content, 40)
     local enableCheck = GUIFrame:CreateCheckbox(ElvUIrow, "Use ElvUI Skinning", ElvUIDB.Enabled ~= false,
         function(checked)
             ElvUIDB.Enabled = checked
@@ -97,7 +97,26 @@ GUIFrame:RegisterContent("HomePage", function(scrollChild, yOffset)
         "Off"
     )
     ElvUIrow:AddWidget(enableCheck, 1)
-    ElvUIcard:AddRow(ElvUIrow, 36)
+    ElvUIcard:AddRow(ElvUIrow, 40)
+
+    -- Separator
+    local ElvUIsep = GUIFrame:CreateRow(ElvUIcard.content, 8)
+    local sepCBCard = GUIFrame:CreateSeparator(ElvUIsep)
+    ElvUIsep:AddWidget(sepCBCard, 1)
+    ElvUIcard:AddRow(ElvUIsep, 8)
+
+    local rowHeight = 50
+    local row = GUIFrame:CreateRow(ElvUIcard.content, rowHeight)
+    local textWidget = GUIFrame:CreateText(
+        row,
+        NRSKNUI:ColorTextByTheme("Information"),
+        NRSKNUI:ColorTextByTheme("• ") ..
+        "Disables all skinning modules when ElvUI is loaded.\nThis way you can still use the non skinning features of the addon without conflict.",
+        rowHeight,
+        "hide"
+    )
+    row:AddWidget(textWidget, 1)
+    ElvUIcard:AddRow(row, rowHeight)
 
     yOffset = yOffset + ElvUIcard:GetContentHeight() + Theme.paddingSmall
 

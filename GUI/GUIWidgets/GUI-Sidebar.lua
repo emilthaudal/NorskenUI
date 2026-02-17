@@ -200,6 +200,15 @@ function GUIFrame:ConfigureSectionHeader(header, config, yOffset, isExpanded)
     header.sectionId = config.id
     header.label:SetText(config.text or "")
 
+    -- Grey out if ElvUI-disabled
+    if config.elvUIDisabled and NRSKNUI:ShouldNotLoadModule() then
+        header.label:SetTextColor(Theme.textSecondary[1], Theme.textSecondary[2], Theme.textSecondary[3], 0.35)
+        header.arrow:SetVertexColor(Theme.textSecondary[1], Theme.textSecondary[2], Theme.textSecondary[3], 0.35)
+    else
+        header.label:SetTextColor(Theme.accent[1], Theme.accent[2], Theme.accent[3], 1)
+        header.arrow:SetVertexColor(Theme.accent[1], Theme.accent[2], Theme.accent[3], 1)
+    end
+
     -- Store expanded state
     header.isExpanded = isExpanded
 
@@ -539,6 +548,7 @@ function GUIFrame:RefreshSidebarImmediate()
             self:ConfigureSectionHeader(header, sectionConfig, yOffset, isExpanded)
             yOffset = yOffset + headerHeight
             if isExpanded and sectionConfig.items then
+                local sectionDisabled = sectionConfig.elvUIDisabled and NRSKNUI:ShouldNotLoadModule()
                 for _, itemConfig in ipairs(sectionConfig.items) do
                     local item = self:GetStaticSidebarItem()
                     item:SetParent(scrollChild)
@@ -548,14 +558,27 @@ function GUIFrame:RefreshSidebarImmediate()
                     item.id = itemConfig.id
                     item.label:SetText(itemConfig.text or "")
                     item.selectedBar:Show()
-                    if itemConfig.id == self.selectedSidebarItem then
-                        item.selectedOverlay:Show()
-                        item.background:Hide()
-                        item.label:SetTextColor(Theme.accent[1], Theme.accent[2], Theme.accent[3], Theme.accent[4] or 1)
-                    else
+
+
+                    if sectionDisabled then
+                        item.label:SetTextColor(Theme.textSecondary[1], Theme.textSecondary[2], Theme.textSecondary[3],
+                            0.35)
                         item.selectedOverlay:Hide()
-                        item.background:Hide()
-                        item.label:SetTextColor(Theme.textSecondary[1], Theme.textSecondary[2], Theme.textSecondary[3], 1)
+                        item.selectedBar:Hide()
+                        item:EnableMouse(false)
+                    else
+                        item:EnableMouse(true) -- re-enable in case it was previously disabled
+                        if itemConfig.id == self.selectedSidebarItem then
+                            item.selectedOverlay:Show()
+                            item.background:Hide()
+                            item.label:SetTextColor(Theme.accent[1], Theme.accent[2], Theme.accent[3],
+                                Theme.accent[4] or 1)
+                        else
+                            item.selectedOverlay:Hide()
+                            item.background:Hide()
+                            item.label:SetTextColor(Theme.textSecondary[1], Theme.textSecondary[2],
+                                Theme.textSecondary[3], 1)
+                        end
                     end
                     yOffset = yOffset + itemHeight + itemSpacing
                 end
