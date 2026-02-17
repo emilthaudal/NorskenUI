@@ -1,5 +1,6 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
+if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 local LSM = NRSKNUI.LSM
 
 -- Check for addon object if available
