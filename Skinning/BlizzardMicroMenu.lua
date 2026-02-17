@@ -1,6 +1,5 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
-if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 
 -- Check for addon object
 if not NRSKNUI.Addon then
@@ -53,6 +52,7 @@ end
 
 -- Module OnEnable
 function MM:OnEnable()
+    if not NRSKNUI:ShouldLoadModule() == true then return end -- Skip if ElvUI is loaded, to avoid conflicts
     if not self.db.Enabled then return end
     C_Timer.After(0.5, function() -- Delay to ensure Blizzard frames exist
         MM:CreateMicroBarFrame()

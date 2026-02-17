@@ -1,8 +1,7 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
-if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 
--- Credit to unhalted for the idea of this module
+-- Credit to unhalted for the idea of this module, not a copy of his code but liked his cook
 
 -- Check for addon object
 if not NRSKNUI.Addon then
@@ -40,6 +39,7 @@ end
 
 -- Module OnEnable
 function DBG:OnEnable()
+    if not NRSKNUI:ShouldLoadModule() == true then return end -- Skip if ElvUI is loaded, to avoid conflicts
     if not C_AddOns.IsAddOnLoaded("Details") then return end -- Make sure we only enable this module if Details is enabled
     if not self.db.Enabled then return end
     if not backdropOneInitialized then

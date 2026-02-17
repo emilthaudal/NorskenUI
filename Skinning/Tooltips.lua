@@ -1,6 +1,5 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
-if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 local LSM = NRSKNUI.LSM
 
 -- Check for addon object if available
@@ -656,6 +655,7 @@ end
 
 -- Initialize tooltip skinning
 function TT:OnEnable()
+    if not NRSKNUI:ShouldLoadModule() == true then return end -- Skip if ElvUI is loaded, to avoid conflicts
     if not self.db.Enabled then return end
     if isInitialized then return end
     TT:CreateTooltipAnchorFrame()

@@ -1,6 +1,5 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
-if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 local Theme = NRSKNUI.Theme
 
 -- Check for addon object
@@ -53,6 +52,7 @@ end
 
 -- Module OnEnable
 function MAP:OnEnable()
+    if not NRSKNUI:ShouldLoadModule() == true then return end -- Skip if ElvUI is loaded, to avoid conflicts
     if not self.db.Enabled then return end
 
     MAP:StripBlizzMap()

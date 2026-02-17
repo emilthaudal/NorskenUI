@@ -1,6 +1,5 @@
 -- NorskenUI namespace
 local _, NRSKNUI = ...
-if C_AddOns.IsAddOnLoaded("ElvUI") and NRSKNUI.db.profile.UseElvUI.Enabled then return end -- Skip if ElvUI is loaded, to avoid conflicts
 
 -- Check for addon object
 if not NRSKNUI.Addon then
@@ -896,6 +895,7 @@ end
 
 -- Module OnEnable
 function ACB:OnEnable()
+    if not NRSKNUI:ShouldLoadModule() == true then return end
     if not self.db.Enabled then return end
     self:BuildConfigTable()
 

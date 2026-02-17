@@ -79,6 +79,29 @@ GUIFrame:RegisterContent("HomePage", function(scrollChild, yOffset)
     yOffset = yOffset + card2:GetContentHeight() + Theme.paddingSmall
 
     ----------------------------------------------------------------
+    -- Card 1: ElvUI Intergration Card
+    ----------------------------------------------------------------
+    local ElvUIcard = GUIFrame:CreateCard(scrollChild, "ElvUI Intergration", yOffset)
+    local ElvUIDB = NRSKNUI.db.profile.UseElvUI
+
+    -- Enable Checkbox
+    local ElvUIrow = GUIFrame:CreateRow(ElvUIcard.content, 36)
+    local enableCheck = GUIFrame:CreateCheckbox(ElvUIrow, "Use ElvUI Skinning", ElvUIDB.Enabled ~= false,
+        function(checked)
+            ElvUIDB.Enabled = checked
+            NRSKNUI:CreateReloadPrompt("Disabling/Enabling this requires a reload to take full effect.")
+        end,
+        true,
+        "Use ElvUI",
+        "On",
+        "Off"
+    )
+    ElvUIrow:AddWidget(enableCheck, 1)
+    ElvUIcard:AddRow(ElvUIrow, 36)
+
+    yOffset = yOffset + ElvUIcard:GetContentHeight() + Theme.paddingSmall
+
+    ----------------------------------------------------------------
     -- Card 3: Current Profile
     ----------------------------------------------------------------
     local card3 = GUIFrame:CreateCard(scrollChild, "Profile", yOffset)
