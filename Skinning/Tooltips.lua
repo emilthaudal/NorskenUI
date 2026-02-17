@@ -142,7 +142,8 @@ function TT:GetOrCreateBackdrop(tooltip)
     end
     -- Create a new backdrop frame
     local backdrop = CreateFrame("Frame", nil, tooltip, "BackdropTemplate")
-    backdrop:SetFrameLevel(tooltip:GetFrameLevel() - 1)
+    local level = tooltip:GetFrameLevel()
+    backdrop:SetFrameLevel(level > 0 and level - 1 or 0)
     backdrop:SetAllPoints(tooltip)
     tooltipBackdrops[tooltip] = backdrop
     return backdrop
