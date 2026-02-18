@@ -9,6 +9,8 @@ local next = next
 local Theme = NRSKNUI.Theme
 local C_CVar = C_CVar
 
+local aceAddon = LibStub("AceAddon-3.0")
+
 local UVARS = {
     taintLog = 0,
 }
@@ -25,7 +27,7 @@ local DEFAULT_PROFILE = "Default"
 
 -- Create the main addon object
 ---@class NorskenUI : AceAddon-3.0, AceEvent-3.0, AceHook-3.0
-local NorskenUI = LibStub("AceAddon-3.0"):NewAddon("NorskenUI", "AceEvent-3.0", "AceHook-3.0")
+local NorskenUI = aceAddon:NewAddon("NorskenUI", "AceEvent-3.0", "AceHook-3.0")
 _G.NorskenUI = NorskenUI
 
 -- Encounter state

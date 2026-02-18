@@ -2,6 +2,9 @@
 ---@class NRSKNUI
 local NRSKNUI = select(2, ...)
 
+---@type NorskenUI
+local NorskenUI = _G.NorskenUI
+
 -- Check for addon object
 if not NorskenUI then
     error("Automation: Addon object not initialized. Check file load order!")
@@ -9,7 +12,7 @@ if not NorskenUI then
 end
 
 -- Create module
----@class Automation
+---@class Automation: AceModule, AceEvent-3.0, AceHook-3.0
 local AUTO = NorskenUI:NewModule("Automation", "AceEvent-3.0", "AceHook-3.0")
 
 -- Localization Setup
