@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
-    error("Durabilityt: Addon object not initialized. Check file load order!")
+if not NorskenUI then
+    error("Durability: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Durability
-local DUR = NRSKNUI.Addon:NewModule("Durability", "AceEvent-3.0")
+local DUR = NorskenUI:NewModule("Durability", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

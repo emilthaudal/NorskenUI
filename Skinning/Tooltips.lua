@@ -5,14 +5,14 @@ local LSM = NRSKNUI.LSM
 
 -- Check for addon object if available
 local error = error
-if not NRSKNUI.Addon then
-    error("CombatMessage: Addon object not initialized. Check file load order!")
+if not NorskenUI then
+    error("Tooltips: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Tooltips
-local TT = NRSKNUI.Addon:NewModule("Tooltips", "AceEvent-3.0")
+local TT = NorskenUI:NewModule("Tooltips", "AceEvent-3.0")
 
 -- Localization
 local hooksecurefunc = hooksecurefunc

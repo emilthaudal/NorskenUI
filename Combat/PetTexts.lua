@@ -3,12 +3,12 @@
 local NRSKNUI = select(2, ...)
 
 -- Safety check
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("PetTexts: Addon object not initialized. Check file load order!")
     return
 end
 
-local PET = NRSKNUI.Addon:NewModule("PetTexts", "AceEvent-3.0")
+local PET = NorskenUI:NewModule("PetTexts", "AceEvent-3.0")
 
 -- Localization
 local UnitClass = UnitClass

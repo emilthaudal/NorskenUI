@@ -12,8 +12,8 @@ local time = time
 
 -- Get module reference
 local function GetModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CooldownStrings", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CooldownStrings", true)
     end
     return nil
 end
@@ -40,9 +40,9 @@ GUIFrame:RegisterContent("CooldownStrings", function(scrollChild, yOffset)
         if not mod then return end
         mod.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("CooldownStrings")
+            NorskenUI:EnableModule("CooldownStrings")
         else
-            NRSKNUI.Addon:DisableModule("CooldownStrings")
+            NorskenUI:DisableModule("CooldownStrings")
         end
     end
 

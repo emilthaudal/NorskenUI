@@ -11,8 +11,8 @@ local pairs, ipairs = pairs, ipairs
 
 -- Helper to get Combat Message module
 local function GetCombatMessageModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CombatMessage", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CombatMessage", true)
     end
     return nil
 end
@@ -56,9 +56,9 @@ GUIFrame:RegisterContent("combatMessage", function(scrollChild, yOffset)
         if not CM then return end
         CM.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("CombatMessage")
+            NorskenUI:EnableModule("CombatMessage")
         else
-            NRSKNUI.Addon:DisableModule("CombatMessage")
+            NorskenUI:DisableModule("CombatMessage")
         end
     end
 

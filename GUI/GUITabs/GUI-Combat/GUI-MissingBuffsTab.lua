@@ -36,7 +36,7 @@ local TAB_BAR_HEIGHT = 28
 
 -- Get module reference
 local function GetModule()
-    return NRSKNUI.Addon:GetModule("MissingBuffs", true)
+    return NorskenUI:GetModule("MissingBuffs", true)
 end
 
 -- Load database settings

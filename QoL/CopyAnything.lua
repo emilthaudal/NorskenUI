@@ -2,14 +2,14 @@
 ---@class NRSKNUI
 local NRSKNUI = select(2, ...)
 
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CopyAnything: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class CopyAnything
-local CopyAnything = NRSKNUI.Addon:NewModule("CopyAnything", "AceEvent-3.0")
+local CopyAnything = NorskenUI:NewModule("CopyAnything", "AceEvent-3.0")
 
 -- Localization
 local IsControlKeyDown = IsControlKeyDown

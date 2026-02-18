@@ -27,8 +27,8 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
 
     -- Helper to get Combat Timer module
     local function GetCombatTimerModule()
-        if NRSKNUI.Addon then
-            return NRSKNUI.Addon:GetModule("CombatTimer", true)
+        if NorskenUI then
+            return NorskenUI:GetModule("CombatTimer", true)
         end
         return nil
     end

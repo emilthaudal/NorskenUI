@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("DragonRiding: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class DragonRiding
-local DR = NRSKNUI.Addon:NewModule("DragonRiding", "AceEvent-3.0")
+local DR = NorskenUI:NewModule("DragonRiding", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

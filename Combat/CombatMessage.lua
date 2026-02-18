@@ -3,13 +3,13 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CombatMessage: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
-local CM = NRSKNUI.Addon:NewModule("CombatMessage", "AceEvent-3.0")
+local CM = NorskenUI:NewModule("CombatMessage", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

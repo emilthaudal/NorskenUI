@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get CDMGlow module
 local function GetCDMGlowModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CDMGlow", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CDMGlow", true)
     end
     return nil
 end
@@ -37,9 +37,9 @@ GUIFrame:RegisterContent("CDMGlow", function(scrollChild, yOffset)
         if not CDMG then return end
         CDMG.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("CDMGlow")
+            NorskenUI:EnableModule("CDMGlow")
         else
-            NRSKNUI.Addon:DisableModule("CDMGlow")
+            NorskenUI:DisableModule("CDMGlow")
         end
     end
 

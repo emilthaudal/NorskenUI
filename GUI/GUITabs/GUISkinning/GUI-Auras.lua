@@ -12,8 +12,8 @@ local pairs = pairs
 
 -- Helper to get Blizzard Mouseover module
 local function GetAurasModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("Auras", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("Auras", true)
     end
     return nil
 end
@@ -44,9 +44,9 @@ GUIFrame:RegisterContent("Auras", function(scrollChild, yOffset)
         if not AURAS then return end
         AURAS.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Auras")
+            NorskenUI:EnableModule("Auras")
         else
-            NRSKNUI.Addon:DisableModule("Auras")
+            NorskenUI:DisableModule("Auras")
         end
     end
 

@@ -4,14 +4,14 @@ local NRSKNUI = select(2, ...)
 local Theme = NRSKNUI.Theme
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CooldownStrings: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class CooldownStrings
-local CS = NRSKNUI.Addon:NewModule("CooldownStrings", "AceEvent-3.0")
+local CS = NorskenUI:NewModule("CooldownStrings", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

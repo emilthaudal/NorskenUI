@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get Blizzard Mouseover module
 local function GetBlizzardMouseoverModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("BlizzardMouseover", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("BlizzardMouseover", true)
     end
     return nil
 end
@@ -43,9 +43,9 @@ GUIFrame:RegisterContent("BlizzardMouseover", function(scrollChild, yOffset)
         if not BMO then return end
         BMO.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("BlizzardMouseover")
+            NorskenUI:EnableModule("BlizzardMouseover")
         else
-            NRSKNUI.Addon:DisableModule("BlizzardMouseover")
+            NorskenUI:DisableModule("BlizzardMouseover")
         end
     end
 

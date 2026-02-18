@@ -3,13 +3,13 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CombatTimer: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
-local CT = NRSKNUI.Addon:NewModule("CombatTimer", "AceEvent-3.0")
+local CT = NorskenUI:NewModule("CombatTimer", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

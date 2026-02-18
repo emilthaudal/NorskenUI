@@ -53,8 +53,8 @@ end
 
 -- Helper to get Combat Res module
 local function GetCombatResModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CombatRes", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CombatRes", true)
     end
     return nil
 end

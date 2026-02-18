@@ -3,13 +3,13 @@
 local NRSKNUI = select(2, ...)
 
 -- Safety check
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CombatCross: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
-local CC = NRSKNUI.Addon:NewModule("CombatCross", "AceEvent-3.0")
+local CC = NorskenUI:NewModule("CombatCross", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

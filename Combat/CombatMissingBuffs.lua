@@ -3,13 +3,13 @@
 local NRSKNUI = select(2, ...)
 
 -- Safety check
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("MissingBuffs: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
-local MBUFFS = NRSKNUI.Addon:NewModule("MissingBuffs", "AceEvent-3.0")
+local MBUFFS = NorskenUI:NewModule("MissingBuffs", "AceEvent-3.0")
 
 -- Localization
 local ipairs, pairs = ipairs, pairs

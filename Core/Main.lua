@@ -24,8 +24,9 @@ NRSKNUI:OnLogin()
 local DEFAULT_PROFILE = "Default"
 
 -- Create the main addon object
+---@class NorskenUI : AceAddon-3.0, AceEvent-3.0, AceHook-3.0
 local NorskenUI = LibStub("AceAddon-3.0"):NewAddon("NorskenUI", "AceEvent-3.0", "AceHook-3.0")
-NRSKNUI.Addon = NorskenUI
+_G.NorskenUI = NorskenUI
 
 -- Encounter state
 NRSKNUI.encounterActive = false

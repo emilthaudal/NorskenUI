@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("UICleanup: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class UICleanup
-local UIC = NRSKNUI.Addon:NewModule("UICleanup", "AceEvent-3.0")
+local UIC = NorskenUI:NewModule("UICleanup", "AceEvent-3.0")
 
 -- Localization Setup
 local ipairs = ipairs

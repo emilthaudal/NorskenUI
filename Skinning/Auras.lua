@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("Auras: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Auras
-local AURAS = NRSKNUI.Addon:NewModule("Auras", "AceEvent-3.0")
+local AURAS = NorskenUI:NewModule("Auras", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

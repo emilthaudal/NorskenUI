@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get Blizzard Mouseover module
 local function GetCopyAnythingModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CopyAnything", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CopyAnything", true)
     end
     return nil
 end
@@ -36,9 +36,9 @@ GUIFrame:RegisterContent("CopyAnything", function(scrollChild, yOffset)
         if not CopyAnything then return end
         CopyAnything.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("CopyAnything")
+            NorskenUI:EnableModule("CopyAnything")
         else
-            NRSKNUI.Addon:DisableModule("CopyAnything")
+            NorskenUI:DisableModule("CopyAnything")
         end
     end
 

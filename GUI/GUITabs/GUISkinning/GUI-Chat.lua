@@ -11,8 +11,8 @@ local pairs, ipairs = pairs, ipairs
 
 -- Helper to get Chat module
 local function GetChatModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("Chat", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("Chat", true)
     end
     return nil
 end
@@ -46,9 +46,9 @@ GUIFrame:RegisterContent("Chat", function(scrollChild, yOffset)
         if not CHAT then return end
         CHAT.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Chat")
+            NorskenUI:EnableModule("Chat")
         else
-            NRSKNUI.Addon:DisableModule("Chat")
+            NorskenUI:DisableModule("Chat")
         end
     end
 

@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("BlizzardMessages: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class BlizzardMessages
-local BM = NRSKNUI.Addon:NewModule("BlizzardMessages", "AceEvent-3.0")
+local BM = NorskenUI:NewModule("BlizzardMessages", "AceEvent-3.0")
 
 -- Localization
 local GetTime = GetTime

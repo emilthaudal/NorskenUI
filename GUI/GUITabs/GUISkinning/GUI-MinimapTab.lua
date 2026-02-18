@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get Blizzard Mouseover module
 local function GetMinimapModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("Minimap", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("Minimap", true)
     end
     return nil
 end
@@ -44,9 +44,9 @@ GUIFrame:RegisterContent("Minimap", function(scrollChild, yOffset)
         if not MAP then return end
         MAP.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Minimap")
+            NorskenUI:EnableModule("Minimap")
         else
-            NRSKNUI.Addon:DisableModule("Minimap")
+            NorskenUI:DisableModule("Minimap")
         end
     end
 

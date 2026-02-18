@@ -10,8 +10,8 @@ local table_insert = table.insert
 
 -- Helper to get Combat Message module
 local function GetTooltipsModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("Tooltips", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("Tooltips", true)
     end
     return nil
 end
@@ -43,9 +43,9 @@ GUIFrame:RegisterContent("tooltips", function(scrollChild, yOffset)
         if not TT then return end
         TT.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Tooltips")
+            NorskenUI:EnableModule("Tooltips")
         else
-            NRSKNUI.Addon:DisableModule("Tooltips")
+            NorskenUI:DisableModule("Tooltips")
         end
     end
 

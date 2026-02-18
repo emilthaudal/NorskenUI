@@ -11,7 +11,7 @@ local pairs, ipairs = pairs, ipairs
 
 -- Get module reference
 local function GetModule()
-    return NRSKNUI.Addon:GetModule("Gateway", true)
+    return NorskenUI:GetModule("Gateway", true)
 end
 
 -- Register Gateway tab content
@@ -36,9 +36,9 @@ GUIFrame:RegisterContent("gateway", function(scrollChild, yOffset)
         if not mod then return end
         db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Gateway")
+            NorskenUI:EnableModule("Gateway")
         else
-            NRSKNUI.Addon:DisableModule("Gateway")
+            NorskenUI:DisableModule("Gateway")
         end
     end
 

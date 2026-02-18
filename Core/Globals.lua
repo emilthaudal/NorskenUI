@@ -224,7 +224,7 @@ end
 
 -- Start all module previews
 function PreviewManager:StartAllPreviews()
-    local Addon = NRSKNUI.Addon
+    local Addon = NorskenUI
     if not Addon then return end
 
     for _, moduleName in ipairs(PREVIEW_MODULES) do
@@ -243,7 +243,7 @@ end
 
 -- Stop all module previews
 function PreviewManager:StopAllPreviews()
-    local Addon = NRSKNUI.Addon
+    local Addon = NorskenUI
     if not Addon then return end
 
     for _, moduleName in ipairs(PREVIEW_MODULES) do

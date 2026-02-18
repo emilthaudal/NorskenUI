@@ -3,13 +3,13 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CombatCursor: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
-local CC = NRSKNUI.Addon:NewModule("CursorCircle", "AceEvent-3.0")
+local CC = NorskenUI:NewModule("CursorCircle", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

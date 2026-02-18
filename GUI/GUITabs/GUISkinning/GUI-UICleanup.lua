@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get UICleanup module
 local function GetUICleanupModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("UICleanup", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("UICleanup", true)
     end
     return nil
 end
@@ -37,9 +37,9 @@ GUIFrame:RegisterContent("UICleanup", function(scrollChild, yOffset)
         if not UIC then return end
         UIC.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("UICleanup")
+            NorskenUI:EnableModule("UICleanup")
         else
-            NRSKNUI.Addon:DisableModule("UICleanup")
+            NorskenUI:DisableModule("UICleanup")
         end
     end
 

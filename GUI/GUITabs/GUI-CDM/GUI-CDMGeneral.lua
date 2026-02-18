@@ -10,8 +10,8 @@ local table_insert = table.insert
 
 -- Helper to get Blizzard Mouseover module
 local function GetCDMModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CDM", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CDM", true)
     end
     return nil
 end
@@ -43,9 +43,9 @@ GUIFrame:RegisterContent("CDM", function(scrollChild, yOffset)
         if not CDM then return end
         CDM.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("CDM")
+            NorskenUI:EnableModule("CDM")
         else
-            NRSKNUI.Addon:DisableModule("CDM")
+            NorskenUI:DisableModule("CDM")
         end
     end
 

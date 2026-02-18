@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("CDMGlow: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class CDMGlow
-local CDMG = NRSKNUI.Addon:NewModule("CDMGlow", "AceEvent-3.0")
+local CDMG = NorskenUI:NewModule("CDMGlow", "AceEvent-3.0")
 
 -- Localization
 local hooksecurefunc = hooksecurefunc

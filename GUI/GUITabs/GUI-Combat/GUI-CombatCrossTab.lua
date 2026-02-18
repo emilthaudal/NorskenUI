@@ -10,7 +10,7 @@ local table_insert = table.insert
 
 -- Get module reference
 local function GetModule()
-    return NRSKNUI.Addon:GetModule("CombatCross", true)
+    return NorskenUI:GetModule("CombatCross", true)
 end
 
 -- Register Combat Cross tab content

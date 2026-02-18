@@ -12,8 +12,8 @@ local table_sort = table.sort
 
 -- Helper to get BlizzardMessages module
 local function GetBlizzardMessagesModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("BlizzardMessages", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("BlizzardMessages", true)
     end
     return nil
 end
@@ -157,10 +157,10 @@ GUIFrame:RegisterContent("messages", function(scrollChild, yOffset)
         function(checked)
             db.Enabled = checked
             if checked then
-                NRSKNUI.Addon:EnableModule("BlizzardMessages")
+                NorskenUI:EnableModule("BlizzardMessages")
                 ApplySettings()
             else
-                NRSKNUI.Addon:DisableModule("BlizzardMessages")
+                NorskenUI:DisableModule("BlizzardMessages")
             end
             UpdateAllWidgetStates()
         end,

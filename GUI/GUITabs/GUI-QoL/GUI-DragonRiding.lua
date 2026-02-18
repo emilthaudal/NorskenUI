@@ -10,16 +10,16 @@ local ipairs = ipairs
 
 -- Helper to get DragonRiding module
 local function GetDragonRidingModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("DragonRiding", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("DragonRiding", true)
     end
     return nil
 end
 
 -- Helper to get CDM module
 local function GetCDMModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("CDM", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("CDM", true)
     end
     return nil
 end
@@ -61,9 +61,9 @@ GUIFrame:RegisterContent("DragonRiding", function(scrollChild, yOffset)
         if not DR then return end
         DR.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("DragonRiding")
+            NorskenUI:EnableModule("DragonRiding")
         else
-            NRSKNUI.Addon:DisableModule("DragonRiding")
+            NorskenUI:DisableModule("DragonRiding")
         end
     end
 

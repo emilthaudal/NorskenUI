@@ -12,8 +12,8 @@ local pairs = pairs
 
 -- Helper to get FocusCastbar module
 local function GetFocusCastbarModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("FocusCastbar", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("FocusCastbar", true)
     end
     return nil
 end
@@ -52,9 +52,9 @@ GUIFrame:RegisterContent("FocusCastbar", function(scrollChild, yOffset)
         if not FCB then return end
         FCB.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("FocusCastbar")
+            NorskenUI:EnableModule("FocusCastbar")
         else
-            NRSKNUI.Addon:DisableModule("FocusCastbar")
+            NorskenUI:DisableModule("FocusCastbar")
         end
     end
 

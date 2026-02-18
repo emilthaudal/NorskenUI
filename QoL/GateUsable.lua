@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("Gateway: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Gateway
-local GATE = NRSKNUI.Addon:NewModule("Gateway", "AceEvent-3.0")
+local GATE = NorskenUI:NewModule("Gateway", "AceEvent-3.0")
 
 -- Localization Setup
 local C_Item = C_Item

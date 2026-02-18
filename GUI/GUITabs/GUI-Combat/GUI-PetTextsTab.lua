@@ -11,7 +11,7 @@ local pairs, ipairs = pairs, ipairs
 
 -- Get module reference
 local function GetModule()
-    return NRSKNUI.Addon:GetModule("PetTexts", true)
+    return NorskenUI:GetModule("PetTexts", true)
 end
 
 -- Register Pet Texts tab content
@@ -36,9 +36,9 @@ GUIFrame:RegisterContent("PetTexts", function(scrollChild, yOffset)
         if not mod then return end
         db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("PetTexts")
+            NorskenUI:EnableModule("PetTexts")
         else
-            NRSKNUI.Addon:DisableModule("PetTexts")
+            NorskenUI:DisableModule("PetTexts")
         end
     end
 

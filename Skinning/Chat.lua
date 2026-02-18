@@ -4,14 +4,14 @@ local NRSKNUI = select(2, ...)
 local Theme = NRSKNUI.Theme
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("Chat: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Chat
-local CHAT = NRSKNUI.Addon:NewModule("Chat", "AceEvent-3.0")
+local CHAT = NorskenUI:NewModule("Chat", "AceEvent-3.0")
 
 -- Localization
 local next = next

@@ -15,8 +15,8 @@ local C_Item = C_Item
 
 -- Get module reference
 local function GetModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("BuffIcons", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("BuffIcons", true)
     end
     return nil
 end

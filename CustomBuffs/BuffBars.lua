@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("BuffBars: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class BuffBars
-local BB = NRSKNUI.Addon:NewModule("BuffBars", "AceEvent-3.0")
+local BB = NorskenUI:NewModule("BuffBars", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame
@@ -483,13 +483,13 @@ function BB:ApplySettings()
     self.db = NRSKNUI.db.profile.CustomBuffs and NRSKNUI.db.profile.CustomBuffs.Bars
     if self.db and self.db.Enabled then
         if not self:IsEnabled() then
-            NRSKNUI.Addon:EnableModule("BuffBars")
+            NorskenUI:EnableModule("BuffBars")
         else
             self:CreateAllTrackers()
         end
     else
         if self:IsEnabled() then
-            NRSKNUI.Addon:DisableModule("BuffBars")
+            NorskenUI:DisableModule("BuffBars")
         end
     end
 end

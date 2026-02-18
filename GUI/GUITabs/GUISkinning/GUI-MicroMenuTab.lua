@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get Blizzard Mouseover module
 local function GetMicroMenuModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("MicroMenu", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("MicroMenu", true)
     end
     return nil
 end
@@ -56,9 +56,9 @@ GUIFrame:RegisterContent("MicroMenu", function(scrollChild, yOffset)
         if not MM then return end
         MM.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("MicroMenu")
+            NorskenUI:EnableModule("MicroMenu")
         else
-            NRSKNUI.Addon:DisableModule("MicroMenu")
+            NorskenUI:DisableModule("MicroMenu")
         end
     end
 

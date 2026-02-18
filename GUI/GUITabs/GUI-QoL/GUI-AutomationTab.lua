@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get Automation module
 local function GetAutomationModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("Automation", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("Automation", true)
     end
     return nil
 end
@@ -44,9 +44,9 @@ GUIFrame:RegisterContent("Automation", function(scrollChild, yOffset)
         if not AUTO then return end
         AUTO.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("Automation")
+            NorskenUI:EnableModule("Automation")
         else
-            NRSKNUI.Addon:DisableModule("Automation")
+            NorskenUI:DisableModule("Automation")
         end
     end
 

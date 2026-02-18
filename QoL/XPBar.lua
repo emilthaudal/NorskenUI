@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("XPBar: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class XPBar
-local XPBar = NRSKNUI.Addon:NewModule("XPBar", "AceEvent-3.0")
+local XPBar = NorskenUI:NewModule("XPBar", "AceEvent-3.0")
 
 -- Localization
 local UnitLevel = UnitLevel

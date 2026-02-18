@@ -69,8 +69,8 @@ local ANCHOR_OPTIONS = {
 
 -- Helper to get ActionBars module
 local function GetActionBarsModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("ActionBars", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("ActionBars", true)
     end
     return nil
 end
@@ -132,9 +132,9 @@ local function ApplyActionBarsState(enabled)
     local db = GetActionBarsDB()
     if db then db.Enabled = enabled end
     if enabled then
-        NRSKNUI.Addon:EnableModule("ActionBars")
+        NorskenUI:EnableModule("ActionBars")
     else
-        NRSKNUI.Addon:DisableModule("ActionBars")
+        NorskenUI:DisableModule("ActionBars")
     end
 end
 

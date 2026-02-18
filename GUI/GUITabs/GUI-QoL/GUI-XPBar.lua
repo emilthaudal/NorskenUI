@@ -11,8 +11,8 @@ local ipairs, pairs = ipairs, pairs
 
 -- Helper to get XPBar module
 local function GetXPBarModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("XPBar", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("XPBar", true)
     end
     return nil
 end
@@ -46,9 +46,9 @@ GUIFrame:RegisterContent("XPBar", function(scrollChild, yOffset)
         if not XPBar then return end
         XPBar.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("XPBar")
+            NorskenUI:EnableModule("XPBar")
         else
-            NRSKNUI.Addon:DisableModule("XPBar")
+            NorskenUI:DisableModule("XPBar")
         end
     end
 

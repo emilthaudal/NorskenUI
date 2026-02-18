@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Safety check
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("Battlenet: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class Battlenet
-local BNET = NRSKNUI.Addon:NewModule("Battlenet", "AceEvent-3.0")
+local BNET = NorskenUI:NewModule("Battlenet", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

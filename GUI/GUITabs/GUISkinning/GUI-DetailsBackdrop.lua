@@ -10,8 +10,8 @@ local ipairs = ipairs
 
 -- Helper to get details backdrop module
 local function GetDetailsBackdropModule()
-    if NRSKNUI.Addon then
-        return NRSKNUI.Addon:GetModule("DetailsBackdrop", true)
+    if NorskenUI then
+        return NorskenUI:GetModule("DetailsBackdrop", true)
     end
     return nil
 end
@@ -80,9 +80,9 @@ GUIFrame:RegisterContent("DetailsBackdrop", function(scrollChild, yOffset)
         if not DBG then return end
         DBG.db.Enabled = enabled
         if enabled then
-            NRSKNUI.Addon:EnableModule("DetailsBackdrop")
+            NorskenUI:EnableModule("DetailsBackdrop")
         else
-            NRSKNUI.Addon:DisableModule("DetailsBackdrop")
+            NorskenUI:DisableModule("DetailsBackdrop")
         end
     end
 

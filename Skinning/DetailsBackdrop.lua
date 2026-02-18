@@ -5,14 +5,14 @@ local NRSKNUI = select(2, ...)
 -- Credit to unhalted for the idea of this module, not a copy of his code but liked his cook
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("DetailsBackdrop: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class DetailsBackdrop
-local DBG = NRSKNUI.Addon:NewModule("DetailsBackdrop", "AceEvent-3.0")
+local DBG = NorskenUI:NewModule("DetailsBackdrop", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

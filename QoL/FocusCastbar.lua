@@ -3,14 +3,14 @@
 local NRSKNUI = select(2, ...)
 
 -- Check for addon object
-if not NRSKNUI.Addon then
+if not NorskenUI then
     error("FocusCastbar: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
 ---@class FocusCastbar
-local FCB = NRSKNUI.Addon:NewModule("FocusCastbar", "AceEvent-3.0")
+local FCB = NorskenUI:NewModule("FocusCastbar", "AceEvent-3.0")
 
 -- Localization
 local CreateFrame = CreateFrame

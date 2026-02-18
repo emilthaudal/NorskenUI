@@ -4,7 +4,7 @@ local NRSKNUI = select(2, ...)
 local GUIFrame = NRSKNUI.GUIFrame
 local Theme = NRSKNUI.Theme
 local LSM = NRSKNUI.LSM
-local DUR = NRSKNUI.Addon:GetModule("Durability", true)
+local DUR = NorskenUI:GetModule("Durability", true)
 
 -- Localization Setup
 local table_insert = table.insert
@@ -52,9 +52,9 @@ local function ApplyDurabilityState(enabled)
     if not DUR then return end
     DUR.db.Enabled = enabled
     if enabled then
-        NRSKNUI.Addon:EnableModule("Durability")
+        NorskenUI:EnableModule("Durability")
     else
-        NRSKNUI.Addon:DisableModule("Durability")
+        NorskenUI:DisableModule("Durability")
     end
 end
 

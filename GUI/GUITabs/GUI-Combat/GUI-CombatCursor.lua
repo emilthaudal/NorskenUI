@@ -177,7 +177,7 @@ end
 -- Register Cursor Circle Tab
 GUIFrame:RegisterContent("cursorCircle", function(scrollChild, yOffset)
     -- Get CursorCircle module
-    local CC = NRSKNUI.Addon and NRSKNUI.Addon:GetModule("CursorCircle", true)
+    local CC = NorskenUI and NorskenUI:GetModule("CursorCircle", true)
     if not CC then
         local errorCard = GUIFrame:CreateCard(scrollChild, "Error", yOffset)
         errorCard:AddLabel("CursorCircle module not loaded")
