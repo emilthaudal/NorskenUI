@@ -195,6 +195,30 @@ function CDM:UpdateSettings()
     end
 end
 
+-- Update alpha on a viewer frame and its buttons
+local function applyAlphaToViewer(viewer, hasItemFrames, alpha)
+    viewer:SetAlpha(alpha)
+    if hasItemFrames then
+        for _, button in next, viewer:GetItemFrames() do
+            if button.SetBorderIgnoreParentAlpha then
+                button:SetBorderIgnoreParentAlpha(alpha < 1)
+            end
+        end
+    end
+end
+
+-- Reset alpha on a viewer frame and its buttons
+local function resetAlphaOnViewer(viewer, hasItemFrames)
+    viewer:SetAlpha(1)
+    if hasItemFrames then
+        for _, button in next, viewer:GetItemFrames() do
+            if button.SetBorderIgnoreParentAlpha then
+                button:SetBorderIgnoreParentAlpha(false)
+            end
+        end
+    end
+end
+
 -- Skin init
 local function initCDMSkin()
     local stateFrames = {} -- Store state frames to update them later
@@ -203,9 +227,12 @@ local function initCDMSkin()
         'EssentialCooldownViewer',
         'UtilityCooldownViewer',
         'BuffIconCooldownViewer',
+        'BCDM_PowerBar',
+        'BCDM_SecondaryPowerBar',
     } do
         local viewer = _G[group]
         if not viewer then break end
+        local hasItemFrames = viewer.GetItemFrames ~= nil
 
         -- Create state handler frame for alpha control
         local stateFrame = CreateFrame('Frame', 'NRSKNUI_CDM_' .. group .. '_StateFrame', UIParent,
@@ -217,6 +244,7 @@ local function initCDMSkin()
         -- Store references
         stateFrame.viewer = viewer
         stateFrame.group = group
+        stateFrame.hasItemFrames = hasItemFrames
 
         -- State change handler
         stateFrame:SetAttribute('_onstate-cdmalphastate', [[
@@ -230,23 +258,10 @@ local function initCDMSkin()
             if not v then return end
 
             if state == 'reduced' then
-                -- In petbattle/bonusbar - use reduced alpha from DB
                 local alpha = CDM.db.AlphaMountPet or 0.5
-                v:SetAlpha(alpha)
-                -- Update button borders
-                for _, button in next, v:GetItemFrames() do
-                    if button.SetBorderIgnoreParentAlpha then
-                        button:SetBorderIgnoreParentAlpha(alpha < 1)
-                    end
-                end
+                applyAlphaToViewer(v, self.hasItemFrames, alpha)
             else
-                -- Normal state - full alpha
-                v:SetAlpha(1)
-                for _, button in next, v:GetItemFrames() do
-                    if button.SetBorderIgnoreParentAlpha then
-                        button:SetBorderIgnoreParentAlpha(false)
-                    end
-                end
+                resetAlphaOnViewer(v, self.hasItemFrames)
             end
         end
 
@@ -256,13 +271,7 @@ local function initCDMSkin()
                 RegisterStateDriver(stateFrame, 'cdmalphastate', '[petbattle][bonusbar:5] reduced; normal')
             else
                 UnregisterStateDriver(stateFrame, 'cdmalphastate')
-                -- Reset to full alpha when feature disabled
-                viewer:SetAlpha(1)
-                for _, button in next, viewer:GetItemFrames() do
-                    if button.SetBorderIgnoreParentAlpha then
-                        button:SetBorderIgnoreParentAlpha(false)
-                    end
-                end
+                resetAlphaOnViewer(viewer, hasItemFrames)
             end
         end
 
@@ -270,7 +279,9 @@ local function initCDMSkin()
         updateStateDriver()
 
         -- Hook skin function
-        hooksecurefunc(viewer, 'OnAcquireItemFrame', GenerateClosure(skin, group))
+        if hasItemFrames and viewer.OnAcquireItemFrame then
+            hooksecurefunc(viewer, 'OnAcquireItemFrame', GenerateClosure(skin, group))
+        end
     end
 
     -- Store update function for later use in the GUI (toggle on/off)
@@ -287,14 +298,8 @@ local function initCDMSkin()
                     stateFrame:OnAlphaStateChange(currentState)
                 else
                     UnregisterStateDriver(stateFrame, 'cdmalphastate')
-                    -- Reset to full alpha when feature disabled
                     stateFrame.currentState = 'normal'
-                    viewer:SetAlpha(1)
-                    for _, button in next, viewer:GetItemFrames() do
-                        if button.SetBorderIgnoreParentAlpha then
-                            button:SetBorderIgnoreParentAlpha(false)
-                        end
-                    end
+                    resetAlphaOnViewer(viewer, stateFrame.hasItemFrames)
                 end
             end
         end
@@ -308,12 +313,7 @@ local function initCDMSkin()
                 local viewer = _G[group]
                 if viewer then
                     local alpha = CDM.db.AlphaMountPet or 0.5
-                    viewer:SetAlpha(alpha)
-                    for _, button in next, viewer:GetItemFrames() do
-                        if button.SetBorderIgnoreParentAlpha then
-                            button:SetBorderIgnoreParentAlpha(alpha < 1)
-                        end
-                    end
+                    applyAlphaToViewer(viewer, stateFrame.hasItemFrames, alpha)
                 end
             end
         end
