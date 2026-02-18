@@ -20,6 +20,7 @@ function NRSKNUI:OnLogin()
     end
     return true
 end
+
 NRSKNUI:OnLogin()
 
 -- Constants
@@ -48,9 +49,18 @@ function NorskenUI:OnInitialize()
         NRSKNUI.db:SetProfile(profileName)
     end
 
+    -- Slight delay so that current Theme color can be applied to the minimap icon
+    C_Timer.After(1, function()
+        NRSKNUI:SetupMinimapIcon()
+    end)
+end
+
+-- Setup minimap icon using LibDataBroker and LibDBIcon
+function NRSKNUI:SetupMinimapIcon()
     -- Setup minimap icon
     local LDB = NRSKNUI.LDB
     local LDBIcon = NRSKNUI.LDBIcon
+    if not LDB or not LDBIcon then return end
     local MyLDB = LDB:NewDataObject("NorskenUI", {
         type = "launcher",
         text = "NorskenUI",
