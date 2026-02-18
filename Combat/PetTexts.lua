@@ -8,6 +8,8 @@ if not NorskenUI then
     return
 end
 
+-- Create module
+---@class PetTexts
 local PET = NorskenUI:NewModule("PetTexts", "AceEvent-3.0")
 
 -- Localization

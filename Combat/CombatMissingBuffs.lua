@@ -9,6 +9,7 @@ if not NorskenUI then
 end
 
 -- Create module
+---@class MissingBuffs
 local MBUFFS = NorskenUI:NewModule("MissingBuffs", "AceEvent-3.0")
 
 -- Localization

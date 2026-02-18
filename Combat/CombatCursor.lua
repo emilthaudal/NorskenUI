@@ -4,11 +4,12 @@ local NRSKNUI = select(2, ...)
 
 -- Check for addon object
 if not NorskenUI then
-    error("CombatCursor: Addon object not initialized. Check file load order!")
+    error("CursorCircle: Addon object not initialized. Check file load order!")
     return
 end
 
 -- Create module
+---@class CursorCircle
 local CC = NorskenUI:NewModule("CursorCircle", "AceEvent-3.0")
 
 -- Localization
