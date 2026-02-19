@@ -259,7 +259,12 @@ function GUIFrame:CreateCheckbox(parent, labelText, initialState, onValueChanged
         -- Call callback after animation completes
         if onValueChanged then
             C_Timer.After(ANIMATION_DURATION, function()
-                onValueChanged(newState)
+                onValueChanged(newState, function(revert)
+                    if revert then
+                        -- Revert back visually
+                        AnimateToState(not newState, false)
+                    end
+                end)
             end)
         end
 

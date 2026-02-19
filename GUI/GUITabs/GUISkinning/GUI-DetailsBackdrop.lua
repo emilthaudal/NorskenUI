@@ -163,15 +163,33 @@ GUIFrame:RegisterContent("DetailsBackdrop", function(scrollChild, yOffset)
     local row2 = GUIFrame:CreateRow(card2.content, 40)
     local autoSizeCheck = GUIFrame:CreateCheckbox(row2, "Auto Size to Parent Frame",
         currentDB.autoSize,
-        function(checked)
-            GetCurrentBackdropDB().autoSize = checked
-            ApplySettings()
-            UpdateAllWidgetStates()
-        end,
-        true,
-        "Auto Size",
-        "On",
-        "Off"
+        function(checked, revert)
+
+            -- If already enabled, dont show promt
+            if not checked then
+                GetCurrentBackdropDB().autoSize = checked
+                ApplySettings()
+                UpdateAllWidgetStates()
+                return
+            end
+
+            -- If not enabled, show promt so user knows wassup
+            NRSKNUI:CreatePrompt(
+                "Details Override",
+                "This will override your current details sizing, are you sure you want to use this feature?",
+                false, nil, false, nil, nil, nil, nil,
+                function()
+                    GetCurrentBackdropDB().autoSize = checked
+                    ApplySettings()
+                    UpdateAllWidgetStates()
+                end,
+                function()
+                    revert(true)
+                end,
+                "Yes",
+                "Cancel"
+            )
+        end
     )
     row2:AddWidget(autoSizeCheck, 1)
     table_insert(allWidgets, autoSizeCheck)
