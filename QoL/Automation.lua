@@ -65,29 +65,29 @@ local function SetupSkipCinematics()
     end
 end
 
-function AUTO:HideTalkingHeadFrame(frame)
-    if frame and AUTO.db.HideTalkingHead then
-        frame:Hide()
+-- Hide talking head
+function AUTO:SetupTalkingHeadHider()
+    if self._talkingHeadHooked then return end
+
+    local function HideTalkingHead(frame)
+        if AUTO.db and AUTO.db.HideTalkingHead and frame then
+            frame:Hide()
+        end
     end
-end
 
-function AUTO:HookTalkingHeadPlayCurrent()
-    self:SecureHook(_G.TalkingHeadFrame, "PlayCurrent", "HideTalkingHeadFrame")
-    self:SecureHook(_G.TalkingHeadFrame, "Reset", "HideTalkingHeadFrame")
-end
-
-function AUTO:DisableTalkingHead()
     if _G.TalkingHeadFrame then
-        self:HookTalkingHeadPlayCurrent()
+        self:SecureHook(_G.TalkingHeadFrame, "PlayCurrent", HideTalkingHead)
+        self:SecureHook(_G.TalkingHeadFrame, "Reset", HideTalkingHead)
     else
-        self:SecureHook("TalkingHead_LoadUI", "HookTalkingHeadPlayCurrent")
+        self:SecureHook("TalkingHead_LoadUI", function()
+            if _G.TalkingHeadFrame then
+                self:SecureHook(_G.TalkingHeadFrame, "PlayCurrent", HideTalkingHead)
+                self:SecureHook(_G.TalkingHeadFrame, "Reset", HideTalkingHead)
+            end
+        end)
     end
-end
 
--- Setup talking head hider
-local function SetupHideTalkingHead()
-    if not AUTO.db.HideTalkingHead then return end
-    AUTO:DisableTalkingHead()
+    self._talkingHeadHooked = true
 end
 
 -- Sell all grey items in bags
@@ -200,7 +200,7 @@ end
 function AUTO:Apply()
     if not self.db.Enabled then return end
     SetupSkipCinematics()
-    SetupHideTalkingHead()
+    self:SetupTalkingHeadHider()
     SetupAutoSellRepair()
     SetupAutoRoleCheck()
     SetupAutoFillDelete()
