@@ -55,7 +55,7 @@ function CS:CreateFrame()
 
     -- Create main container frame
     local frame = CreateFrame("Frame", "NRSKNUI_CooldownStringsPanel", UIParent, "BackdropTemplate")
-    frame:SetSize(280, 220)
+    frame:SetSize(230, 220)
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
 

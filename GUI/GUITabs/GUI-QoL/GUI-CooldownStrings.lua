@@ -414,7 +414,7 @@ GUIFrame:RegisterContent("CooldownStrings", function(scrollChild, yOffset)
             editBox:SetFocus()
         end)
 
-        row3b:AddWidget(editContainer, 1)
+        row3b:AddWidget(editContainer, 0.45)
         table_insert(allWidgets, editContainer)
 
         card3:AddRow(row3b, 140)
