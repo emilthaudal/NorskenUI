@@ -259,6 +259,9 @@ function BM:PreviewZone()
         PVPInfoTextString.fadingOut = false
         PVPInfoTextString.startTime = GetTime()
     end
+
+    BM:PreviewUIErrors()
+    BM:PreviewActionStatus()
 end
 
 -- On Module disable, reset to blizzar defaults

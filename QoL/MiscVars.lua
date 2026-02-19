@@ -22,7 +22,7 @@ local C_CVar = C_CVar
 -- Module variables
 MVAR._suppressCVarUpdate = false
 
--- Cvar list
+-- Cvar list, exposed globally so that the GUI can access it aswell
 MVAR.DEFS = {
     {
         key = "nameplateUseClassColorForFriendlyPlayerUnitNames",

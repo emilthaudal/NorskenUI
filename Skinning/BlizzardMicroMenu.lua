@@ -56,7 +56,7 @@ end
 function MM:OnEnable()
     if NRSKNUI:ShouldNotLoadModule() then return end -- Skip if ElvUI is loaded, to avoid conflicts
     if not self.db.Enabled then return end
-    C_Timer.After(0.5, function() -- Delay to ensure Blizzard frames exist
+    C_Timer.After(0.5, function()                    -- Delay to ensure Blizzard frames exist
         MM:CreateMicroBarFrame()
         MM:CreateMicroBar()
         MM:ReparentButtons()
@@ -131,47 +131,8 @@ function MM:CreateMicroBar()
     borderFrame:SetAllPoints(backdrop)
     borderFrame:SetFrameStrata("DIALOG")
     borderFrame:SetFrameLevel(microBar:GetFrameLevel() + 1)
+    NRSKNUI:AddBorders(backdrop, self.db.BackdropBorderColor, borderFrame)
 
-    -- Create top border
-    local borderTop = borderFrame:CreateTexture(nil, "OVERLAY", nil, 7)
-    borderTop:SetHeight(1)
-    borderTop:SetPoint("TOPLEFT", backdrop, "TOPLEFT", 0, 0)
-    borderTop:SetPoint("TOPRIGHT", backdrop, "TOPRIGHT", 0, 0)
-    borderTop:SetColorTexture(unpack(self.db.BackdropBorderColor))
-    borderTop:SetTexelSnappingBias(0)
-    borderTop:SetSnapToPixelGrid(false)
-
-    -- Create bottom border
-    local borderBottom = borderFrame:CreateTexture(nil, "OVERLAY", nil, 7)
-    borderBottom:SetHeight(1)
-    borderBottom:SetPoint("BOTTOMLEFT", backdrop, "BOTTOMLEFT", 0, 0)
-    borderBottom:SetPoint("BOTTOMRIGHT", backdrop, "BOTTOMRIGHT", 0, 0)
-    borderBottom:SetColorTexture(unpack(self.db.BackdropBorderColor))
-    borderBottom:SetTexelSnappingBias(0)
-    borderBottom:SetSnapToPixelGrid(false)
-
-    -- Create left border
-    local borderLeft = borderFrame:CreateTexture(nil, "OVERLAY", nil, 7)
-    borderLeft:SetWidth(1)
-    borderLeft:SetPoint("TOPLEFT", backdrop, "TOPLEFT", 0, 0)
-    borderLeft:SetPoint("BOTTOMLEFT", backdrop, "BOTTOMLEFT", 0, 0)
-    borderLeft:SetColorTexture(unpack(self.db.BackdropBorderColor))
-    borderLeft:SetTexelSnappingBias(0)
-    borderLeft:SetSnapToPixelGrid(false)
-
-    -- Create right border
-    local borderRight = borderFrame:CreateTexture(nil, "OVERLAY", nil, 7)
-    borderRight:SetWidth(1)
-    borderRight:SetPoint("TOPRIGHT", backdrop, "TOPRIGHT", 0, 0)
-    borderRight:SetPoint("BOTTOMRIGHT", backdrop, "BOTTOMRIGHT", 0, 0)
-    borderRight:SetColorTexture(unpack(self.db.BackdropBorderColor))
-    borderRight:SetTexelSnappingBias(0)
-    borderRight:SetSnapToPixelGrid(false)
-
-    microBar.borderTop = borderTop
-    microBar.borderBottom = borderBottom
-    microBar.borderLeft = borderLeft
-    microBar.borderRight = borderRight
     microBar.borderFrame = borderFrame
     microBar.initialized = true
 end
@@ -257,13 +218,9 @@ function MM:UpdateMicroBar()
     if microBar and microBar.backdrop then
         microBar.backdrop:SetShown(self.db.ShowBackdrop ~= false)
         microBar.backdrop:SetBackdropColor(unpack(self.db.BackdropColor))
-    end
-    -- Update Backdrop Border
-    if microBar and microBar.borderTop then
-        microBar.borderTop:SetColorTexture(unpack(self.db.BackdropBorderColor))
-        microBar.borderBottom:SetColorTexture(unpack(self.db.BackdropBorderColor))
-        microBar.borderLeft:SetColorTexture(unpack(self.db.BackdropBorderColor))
-        microBar.borderRight:SetColorTexture(unpack(self.db.BackdropBorderColor))
+
+        local borderColor = self.db.BackdropBorderColor
+        microBar.backdrop:SetBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4])
     end
 
     MM:UpdateAlpha()
