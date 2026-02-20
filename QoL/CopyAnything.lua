@@ -226,6 +226,10 @@ function CopyAnything:TryCopy(key)
     end
 end
 
+function CopyAnything:ApplySettings()
+    CopyAnything:UpdateDB()
+end
+
 -- Module OnEnable
 function CopyAnything:OnEnable()
     if not self.db.Enabled then return end

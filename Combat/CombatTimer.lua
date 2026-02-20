@@ -178,6 +178,7 @@ function CT:ApplySettings()
 
     self:UpdateFrameSize()
     self:UpdateText()
+    self:ApplyPosition()
 end
 
 -- OnUpdate handler for timer updates

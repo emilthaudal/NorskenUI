@@ -35,7 +35,7 @@ GUIFrame:RegisterContent("Minimap", function(scrollChild, yOffset)
     -- Helper to apply settings
     local function ApplySettings()
         if MAP then
-            MAP:RefreshAll()
+            MAP:ApplySettings()
         end
     end
 

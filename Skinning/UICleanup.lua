@@ -59,6 +59,10 @@ local function SetupHideBlizzardClutter()
     end
 end
 
+function UIC:ApplySettings()
+    SetupHideBlizzardClutter()
+end
+
 -- Module OnEnable
 function UIC:OnEnable()
     if NRSKNUI:ShouldNotLoadModule() then return end -- Skip if ElvUI is loaded, to avoid conflicts

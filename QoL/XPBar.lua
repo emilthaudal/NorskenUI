@@ -74,7 +74,7 @@ function XPBar:OnEnable()
     self:RegisterEvents()
     self:Update()
     C_Timer.After(1, function()
-        self:ApplyStyling()
+        self:ApplySettings()
     end)
 
     -- Register with EditMode if not already registered
@@ -248,7 +248,7 @@ function XPBar:OnLevelUp()
 end
 
 -- Function that GUI can call for updates
-function XPBar:ApplyStyling()
+function XPBar:ApplySettings()
     if not self.bar then return end
     local r, g, b, a = self:GetColor()
 

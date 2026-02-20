@@ -296,7 +296,7 @@ function DR:CreateFrames()
 end
 
 -- Apply settings
-function DR:ApplySettings()
+function DR:Refresh()
     if not self.container then return end
     local db = self.db
     local barWidth = db.Width or 252
@@ -386,8 +386,8 @@ function DR:ApplyPosition()
 end
 
 -- Refresh all
-function DR:Refresh()
-    self:ApplySettings()
+function DR:ApplySettings()
+    self:Refresh()
     self:ApplyPosition()
 
     -- Update displays if visible

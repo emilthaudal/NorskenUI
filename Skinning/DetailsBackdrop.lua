@@ -46,7 +46,7 @@ end
 
 -- Module OnEnable
 function DBG:OnEnable()
-    if NRSKNUI:ShouldNotLoadModule() then return end -- Skip if ElvUI is loaded, to avoid conflicts
+    if NRSKNUI:ShouldNotLoadModule() then return end         -- Skip if ElvUI is loaded, to avoid conflicts
     if not C_AddOns.IsAddOnLoaded("Details") then return end -- Make sure we only enable this module if Details is enabled
     if not self.db.Enabled then return end
     if not backdropOneInitialized then
@@ -423,6 +423,28 @@ function DBG:UpdateDetailsBackdropTwo()
     -- Update border colors
     for _, borderTwo in pairs(self.bordersTwo) do
         borderTwo:SetColorTexture(unpack(bgTwoDB.BorderColor))
+    end
+end
+
+function DBG:ApplySettings()
+    if not self.db.Enabled then
+        if self.backdropOne then
+            self.backdropOne:Hide()
+        end
+        if self.backdropTwo then
+            self.backdropTwo:Hide()
+        end
+    else
+        if self.backdropOne then
+            self:UpdateDetailsBackdropOne()
+        else
+            self:CreateBackdropOne()
+        end
+        if self.backdropTwo then
+            self:UpdateDetailsBackdropTwo()
+        else
+            self:CreateBackdropTwo()
+        end
     end
 end
 

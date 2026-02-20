@@ -244,6 +244,8 @@ function FCB:ApplySettings()
             NRSKNUI:ApplyFont(targetText, db.FontFace, targetSettings.FontSize, db.FontOutline)
         end
     end
+
+    self:ApplyPosition()
 end
 
 -- Apply position

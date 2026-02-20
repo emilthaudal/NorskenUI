@@ -787,6 +787,10 @@ function CS:RefreshPanel()
     self:UpdateEditBox()
 end
 
+function CS:ApplySettings()
+    CS:UpdateDB()
+end
+
 -- Module OnEnable
 function CS:OnEnable()
     if not self.db.Enabled then return end

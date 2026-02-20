@@ -34,7 +34,7 @@ GUIFrame:RegisterContent("CDM", function(scrollChild, yOffset)
     -- Helper to apply settings
     local function ApplySettings()
         if CDM then
-            CDM:UpdateSettings()
+            CDM:ApplySettings()
         end
     end
 

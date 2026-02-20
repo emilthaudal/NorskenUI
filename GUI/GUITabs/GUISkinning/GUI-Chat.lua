@@ -37,7 +37,7 @@ GUIFrame:RegisterContent("Chat", function(scrollChild, yOffset)
     -- Helper to apply settings
     local function ApplySettings()
         if CHAT then
-            CHAT:Update()
+            CHAT:ApplySettings()
         end
     end
 

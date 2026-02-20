@@ -33,7 +33,7 @@ GUIFrame:RegisterContent("XPBar", function(scrollChild, yOffset)
     -- Apply XPBar settings
     local function ApplySettings()
         if XPBar then
-            XPBar:ApplyStyling()
+            XPBar:ApplySettings()
         end
     end
 

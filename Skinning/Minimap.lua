@@ -70,9 +70,9 @@ function MAP:OnEnable()
     MAP:CreateBugSackButton()
 
     -- One-time hooks for refresh triggers
-    Minimap:HookScript("OnShow", function() C_Timer.After(1, function() MAP:RefreshAll() end) end)
-    MinimapCluster:HookScript("OnShow", function() C_Timer.After(1, function() MAP:RefreshAll() end) end)
-    MinimapCluster:HookScript("OnEvent", function() C_Timer.After(1, function() MAP:RefreshAll() end) end)
+    Minimap:HookScript("OnShow", function() C_Timer.After(1, function() MAP:ApplySettings() end) end)
+    MinimapCluster:HookScript("OnShow", function() C_Timer.After(1, function() MAP:ApplySettings() end) end)
+    MinimapCluster:HookScript("OnEvent", function() C_Timer.After(1, function() MAP:ApplySettings() end) end)
     if not hooked.queuePosition then
         hooksecurefunc(QueueStatusButton, "UpdatePosition", function()
             local queueBtnDB = self.db.QueueStatus
@@ -96,7 +96,7 @@ function MAP:OnEnable()
     C_Timer.After(0.5, DisableMinimapEditMode)
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
         C_Timer.After(0.1, function()
-            self:RefreshAll()
+            self:ApplySettings()
         end)
     end)
 
@@ -394,7 +394,7 @@ function MAP:UpdateSettings()
 end
 
 -- Complete refresh
-function MAP:RefreshAll()
+function MAP:ApplySettings()
     if not self.db.Enabled then return end
     MAP:ApplyPosSize()
     MAP:UpdateMinimapBorder()

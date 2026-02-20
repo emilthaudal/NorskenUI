@@ -27,10 +27,11 @@ function CDMG:OnInitialize()
 end
 
 -- Setup hook
-local function SetupGlowHooks()
-    if not CDMG.db.Enabled then return end
+function CDMG:SetupGlowHooks()
+    if not CDMG.db.Enabled or CDMG._raidManagerHooked then return end
     if ActionButtonSpellAlertManager then
         if ActionButtonSpellAlertManager.ShowAlert then
+            CDMG._raidManagerHooked = true
             hooksecurefunc(ActionButtonSpellAlertManager, "ShowAlert", function(_, button)
                 button.SpellActivationAlert.ProcStartFlipbook:Hide() -- Hide proc glow animation
                 button.SpellActivationAlert:SetFrameStrata("HIGH")   -- Set strata high so that the custom swipe in CDMOverlay.lua gets placed behind glow
@@ -40,10 +41,14 @@ local function SetupGlowHooks()
     end
 end
 
+function CDMG:ApplySettings()
+    self:SetupGlowHooks()
+end
+
 -- Module OnEnable
 function CDMG:OnEnable()
     if not self.db.Enabled then return end
-    SetupGlowHooks()
+    self:ApplySettings()
 end
 
 -- Module OnDisable

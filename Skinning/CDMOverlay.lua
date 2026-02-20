@@ -149,7 +149,7 @@ local function skin(group, _, button)
 end
 
 -- Update function for GUI changes
-function CDM:UpdateSettings()
+function CDM:ApplySettings()
     if not self:IsEnabled() then return end
     local fontPath = NRSKNUI:GetFontPath(self.db.FontFace)
 

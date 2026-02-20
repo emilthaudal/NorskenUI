@@ -54,21 +54,21 @@ local function FadeOut()
     NRSKNUI:CombatSafeFade(CompactRaidFrameManager, BRMG.db.Alpha, BRMG.db.FadeOutDuration)
 end
 
+-- Function to help with the need to set position when RaidFrameManager is toggled and initially on load
+function BRMG:ApplyPosition()
+    local point, relTo, relPoint, x = CompactRaidFrameManager:GetPoint()
+    if point then
+        CompactRaidFrameManager:ClearAllPoints()
+        CompactRaidFrameManager:SetPoint(point, relTo, relPoint, x, self.db.Position.YOffset)
+    end
+end
+
 -- Setup styling
 function BRMG:SetupRaidManager()
     if not CompactRaidFrameManager or BRMG._raidManagerHooked then return end
 
     -- Apply Strata
     CompactRaidFrameManager:SetFrameStrata(self.db.Strata)
-
-    -- Function to help with the need to set position when RaidFrameManager is toggled and initially on load
-    local function ApplyPosition()
-        local point, relTo, relPoint, x = CompactRaidFrameManager:GetPoint()
-        if point then
-            CompactRaidFrameManager:ClearAllPoints()
-            CompactRaidFrameManager:SetPoint(point, relTo, relPoint, x, self.db.Position.YOffset)
-        end
-    end
 
     -- Hook fade updates if not already done
     if not BRMG._raidManagerHooked then
@@ -83,7 +83,7 @@ function BRMG:SetupRaidManager()
         end)
 
         hooksecurefunc("CompactRaidFrameManager_Toggle", function()
-            ApplyPosition()
+            BRMG:ApplyPosition()
             if MouseIsOver(CompactRaidFrameManager) then
                 FadeIn()
             else
@@ -97,7 +97,6 @@ function BRMG:SetupRaidManager()
 
         BRMG._raidManagerHooked = true
     end
-    ApplyPosition()
 
     -- Initial state: fade it out if the mouse isn't there
     if not MouseIsOver(CompactRaidFrameManager) then
@@ -106,10 +105,15 @@ function BRMG:SetupRaidManager()
     end
 end
 
+function BRMG:ApplySettings()
+    self:SetupRaidManager()
+    self:ApplyPosition()
+end
+
 -- Module OnEnable
 function BRMG:OnEnable()
     if not self.db.Enabled then return end
     C_Timer.After(1, function()
-        BRMG:SetupRaidManager()
+        self:ApplySettings()
     end)
 end

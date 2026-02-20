@@ -254,7 +254,7 @@ function CHAT:UpdateFonts()
 end
 
 -- Main update function (called from GUI)
-function CHAT:Update()
+function CHAT:ApplySettings()
     self:UpdateBackdrop()
     self:UpdateFonts()
     self:UpdateEditBox()
