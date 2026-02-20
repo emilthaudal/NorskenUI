@@ -23,9 +23,14 @@ local C_Timer = C_Timer
 local UIParent = UIParent
 local _G = _G
 
+-- Update db, used for profile changes
+function BM:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.BlizzardMessages
+end
+
 -- Module init
 function BM:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.BlizzardMessages
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -35,7 +40,7 @@ function BM:OnEnable()
     if not self.db.Enabled then return end
     C_Timer.After(1.0, function()
         if self:IsEnabled() then
-            self:Apply()
+            self:ApplySettings()
         end
     end)
 end
@@ -190,7 +195,7 @@ function BM:ResetActionStatusText()
 end
 
 -- Apply all styles
-function BM:Apply()
+function BM:ApplySettings()
     if not self.db or not self.db.Enabled then
         self:Reset()
         return

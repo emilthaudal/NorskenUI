@@ -30,9 +30,14 @@ BI.trackerFrames = {}
 BI.containerFrame = nil
 BI.activeTimers = {}
 
+-- Update db, used for profile changes
+function BI:UpdateDB()
+    self.db = NRSKNUI.db.profile.CustomBuffs.Icons
+end
+
 -- Module init
 function BI:OnInitialize()
-    self.db = NRSKNUI.db.profile.CustomBuffs and NRSKNUI.db.profile.CustomBuffs.Icons
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

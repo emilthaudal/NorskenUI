@@ -30,9 +30,14 @@ local InCombatLockdown = InCombatLockdown
 local C_AddOns = C_AddOns
 local StaticPopupDialogs = StaticPopupDialogs
 
+-- Update db, used for profile changes
+function CopyAnything:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.CopyAnything
+end
+
 -- Module init
 function CopyAnything:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.CopyAnything
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

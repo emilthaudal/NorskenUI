@@ -35,6 +35,23 @@ function NorskenUI:OnInitialize()
         NRSKNUI.db:SetProfile(profileName)
     end
 
+    -- Profile change callbacks
+    NRSKNUI.db.RegisterCallback(NRSKNUI, "OnProfileChanged", function()
+        if NRSKNUI.ProfileManager then
+            NRSKNUI.ProfileManager:RefreshAllModules()
+        end
+    end)
+    NRSKNUI.db.RegisterCallback(NRSKNUI, "OnProfileCopied", function()
+        if NRSKNUI.ProfileManager then
+            NRSKNUI.ProfileManager:RefreshAllModules()
+        end
+    end)
+    NRSKNUI.db.RegisterCallback(NRSKNUI, "OnProfileReset", function()
+        if NRSKNUI.ProfileManager then
+            NRSKNUI.ProfileManager:RefreshAllModules()
+        end
+    end)
+
     -- Slight delay so that current Theme color can be applied to the minimap icon
     C_Timer.After(1, function()
         NRSKNUI:SetupMinimapIcon()

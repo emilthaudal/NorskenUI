@@ -21,9 +21,14 @@ local pairs = pairs
 local SecureCmdOptionParse = SecureCmdOptionParse
 local _G = _G
 
+-- Update db, used for profile changes
+function CDM:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.CDM
+end
+
 -- Module init
 function CDM:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.CDM
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

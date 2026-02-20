@@ -26,9 +26,14 @@ local MainStatusTrackingBarContainer = MainStatusTrackingBarContainer
 -- Module variables
 local HideBlizzardBarInit = false
 
+-- Update db, used for profile changes
+function XPBar:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.XPBar
+end
+
 -- Module init
 function XPBar:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.XPBar
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

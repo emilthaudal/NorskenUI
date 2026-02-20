@@ -24,9 +24,14 @@ local appliedHooks = {
     bags = false,
 }
 
+-- Update db, used for profile changes
+function BMO:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.BlizzardMouseover
+end
+
 -- Module init
 function BMO:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.BlizzardMouseover
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -102,7 +107,7 @@ end
 
 -- Mouseover application
 -- called from GUI sliders
-function BMO:Apply()
+function BMO:ApplySettings()
     if self.db.Enabled then
         self:UpdateAllAlpha()
     end

@@ -80,9 +80,14 @@ local SetTextColor = UIParent:CreateFontString().SetTextColor
 local originalSetAlpha = getmetatable(CreateFrame("Frame")).__index.SetAlpha
 local updateTabColor
 
+-- Update db, used for profile changes
+function CHAT:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.Chat
+end
+
 -- Module init bruv
 function CHAT:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.Chat
+    self:UpdateDB()
     self.backdrops = {}
     self:SetEnabledState(false)
 end

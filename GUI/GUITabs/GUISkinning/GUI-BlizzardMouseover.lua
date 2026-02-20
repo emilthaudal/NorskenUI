@@ -34,7 +34,7 @@ GUIFrame:RegisterContent("BlizzardMouseover", function(scrollChild, yOffset)
     -- Helper to apply settings
     local function ApplySettings()
         if BMO then
-            BMO:Apply()
+            BMO:ApplySettings()
         end
     end
 

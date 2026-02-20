@@ -649,13 +649,6 @@ local function ShowStanceIcon(spellId, reverseIcon, currentSpellId)
     end
 end
 
--- Hide the stance icon
-local function HideStanceIcon()
-    if stanceFrame then
-        stanceFrame:Hide()
-    end
-end
-
 -- Stance text display functions
 local function UpdateStanceTextDisplay()
     if not MBUFFS.db then return end
@@ -740,28 +733,19 @@ local function UpdateStanceTextDisplay()
     end
 end
 
--- Hide stance text func
-local function HideStanceText()
-    if stanceTextFrame then
-        stanceTextFrame:Hide()
-    end
-end
-
--- Display Functions
+-- Update icon texture, font and size
 local function UpdateIconAppearance(iconFrame, buff, text)
-    local raidDb = MBUFFS.db.RaidBuffDisplay
-
     -- Apply texture settings
     local texture = GetSpellTexture(buff.spellId)
     if not texture then texture = buff.iconTexture or WEAPON_ENCHANT_ICON end
     iconFrame.icon:SetTexture(texture)
 
     -- Apply font settings
-    NRSKNUI:ApplyFontSettings(iconFrame, raidDb, nil)
+    NRSKNUI:ApplyFontSettings(iconFrame, MBUFFS.db.RaidBuffDisplay, nil)
     iconFrame.text:SetText(text or buff.text or GENERALBUFF_TEXT)
 
     -- Apply size settings
-    iconFrame:SetSize(raidDb.IconSize, raidDb.IconSize)
+    iconFrame:SetSize(MBUFFS.db.RaidBuffDisplay.IconSize, MBUFFS.db.RaidBuffDisplay.IconSize)
     iconFrame.icon:SetAllPoints(iconFrame)
 end
 
@@ -796,7 +780,9 @@ end
 
 -- Check stances/forms
 local function CheckStances()
-    HideStanceIcon()
+    if stanceFrame then
+        stanceFrame:Hide()
+    end
     -- Also update stance text display
     UpdateStanceTextDisplay()
     if not MBUFFS.db then return end
@@ -929,8 +915,12 @@ end
 -- Hide everything
 local function HideAllNotifications()
     HideMissingBuffIcons()
-    HideStanceIcon()
-    HideStanceText()
+    if stanceFrame then
+        stanceFrame:Hide()
+    end
+    if stanceTextFrame then
+        stanceTextFrame:Hide()
+    end
 end
 
 -- Check only weapon enchants
@@ -1152,9 +1142,14 @@ local function OnAuraChange(unit, updateInfo)
     CheckForMissingBuffs()
 end
 
+-- Update db, used for profile changes
+function MBUFFS:UpdateDB()
+    self.db = NRSKNUI.db.profile.MissingBuffs
+end
+
 -- Module init
 function MBUFFS:OnInitialize()
-    self.db = NRSKNUI.db.profile.MissingBuffs
+    self:UpdateDB()
     local _, class = UnitClass("player")
     playerClass = class
     playerBuffs = CLASS_BUFFS[class]

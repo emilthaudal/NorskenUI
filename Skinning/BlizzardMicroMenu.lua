@@ -46,9 +46,14 @@ local hooksApplied = false
 -- Custom microBar references
 local microBar
 
+-- Update db, used for profile changes
+function MM:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.MicroMenu
+end
+
 -- Module init
 function MM:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.MicroMenu
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -153,6 +158,7 @@ end
 
 -- Function to update microbar styling
 function MM:UpdateMicroBar()
+    if not microBar then return end
     if InCombatLockdown() then
         MM:RegisterEvent("PLAYER_REGEN_ENABLED")
         return
@@ -295,7 +301,7 @@ function MM:UpdateAlpha()
 end
 
 -- Apply function
-function MM:Apply()
+function MM:ApplySettings()
     if not self.db.Enabled then return end
     MM:UpdatePosition()
     MM:UpdateMicroBar()

@@ -50,9 +50,14 @@ CC.GCDModeOptions = {
 CC.frame = nil
 CC.gcdFrame = nil
 
+-- Update db, used for profile changes
+function CC:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.CursorCircle
+end
+
 -- Module init
 function CC:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.CursorCircle
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

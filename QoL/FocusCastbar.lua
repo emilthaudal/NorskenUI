@@ -55,9 +55,14 @@ local CLASS_INTERRUPTS = {
     [13] = { 351338 },                      -- Evoker
 }
 
+-- Update db, used for profile changes
+function FCB:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.FocusCastbar
+end
+
 -- Module init
 function FCB:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.FocusCastbar
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

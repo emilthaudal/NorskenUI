@@ -10,6 +10,7 @@
     <Script file="PixelPerfect.lua" />
     <Script file="EditMode.lua" />
     <Script file="Main.lua" />
+    <Script file="ProfileManager.lua" />
     <Script file="NUI-Dialog.lua" />
     <Script file="Colors.lua" />
 </Ui>

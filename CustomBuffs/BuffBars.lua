@@ -33,9 +33,14 @@ BB.trackerFrames = {}
 BB.updateFrame = nil
 BB.containerFrame = nil
 
+-- Update db, used for profile changes
+function BB:UpdateDB()
+    self.db = NRSKNUI.db.profile.CustomBuffs.Bars
+end
+
 -- Module init
 function BB:OnInitialize()
-    self.db = NRSKNUI.db.profile.CustomBuffs and NRSKNUI.db.profile.CustomBuffs.Bars
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

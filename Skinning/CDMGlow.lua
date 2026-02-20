@@ -15,9 +15,14 @@ local CDMG = NorskenUI:NewModule("CDMGlow", "AceEvent-3.0")
 -- Localization
 local hooksecurefunc = hooksecurefunc
 
+-- Update db, used for profile changes
+function CDMG:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.CDMGlow
+end
+
 -- Module init
 function CDMG:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.CDMGlow
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

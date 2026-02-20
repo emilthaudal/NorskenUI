@@ -17,9 +17,14 @@ local hooksecurefunc = hooksecurefunc
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 
+-- Update db, used for profile changes
+function BRMG:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.BlizzardRM
+end
+
 -- Module init
 function BRMG:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.BlizzardRM
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

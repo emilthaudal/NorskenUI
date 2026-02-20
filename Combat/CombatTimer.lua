@@ -29,9 +29,14 @@ CT.isPreview = false
 -- Store last combat duration
 NRSKNUI.lastCombatDuration = 0
 
+-- Update db, used for profile changes
+function CT:UpdateDB()
+    self.db = NRSKNUI.db.profile.CombatTimer
+end
+
 -- Module init
 function CT:OnInitialize()
-    self.db = NRSKNUI.db.profile.CombatTimer
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

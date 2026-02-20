@@ -29,9 +29,14 @@ local DetailsWindow1 = _G["Details_WindowFrame1"]
 local DetailsBase2 = _G["DetailsBaseFrame2"]
 local DetailsWindow2 = _G["Details_WindowFrame2"]
 
+-- Update db, used for profile changes
+function DBG:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.DetailsBackdrop
+end
+
 -- Module init
 function DBG:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.DetailsBackdrop
+    self:UpdateDB()
     self.backdropOne = nil
     self.bordersOne = {}
     self.backdropTwo = nil

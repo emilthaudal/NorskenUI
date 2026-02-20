@@ -43,9 +43,14 @@ local CARD_BACKDROP = {
     edgeSize = 1,
 }
 
+-- Update db, used for profile changes
+function CS:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.CooldownStrings
+end
+
 -- Module init
 function CS:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.CooldownStrings
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

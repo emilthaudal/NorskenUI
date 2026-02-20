@@ -115,9 +115,14 @@ local function SetupPositionHooks()
     end)
 end
 
+-- Update db, used for profile changes
+function BNET:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.Battlenet
+end
+
 -- Module init
 function BNET:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.Battlenet
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

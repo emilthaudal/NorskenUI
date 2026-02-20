@@ -27,9 +27,14 @@ CC.text = nil
 CC.previewActive = false
 CC.combatActive = false
 
+-- Update db, used for profile changes
+function CC:UpdateDB()
+    self.db = NRSKNUI.db.profile.CombatCross
+end
+
 -- Module init
 function CC:OnInitialize()
-    self.db = NRSKNUI.db.profile.CombatCross
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

@@ -37,9 +37,14 @@ local StaticPopupDialogs = StaticPopupDialogs
 local C_CVar = C_CVar
 local _G = _G
 
+-- Update db, used for profile changes
+function AUTO:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.Automation
+end
+
 -- Module init
 function AUTO:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.Automation
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -196,7 +201,7 @@ local function ApplyAutoLoot()
 end
 
 -- Apply automation settings
-function AUTO:Apply()
+function AUTO:ApplySettings()
     if not self.db.Enabled then return end
     SetupSkipCinematics()
     self:SetupTalkingHeadHider()
@@ -210,6 +215,6 @@ end
 function AUTO:OnEnable()
     if not self.db.Enabled then return end
     C_Timer.After(1.0, function() -- Wait for frames to be ready
-        AUTO:Apply()
+        AUTO:ApplySettings()
     end)
 end

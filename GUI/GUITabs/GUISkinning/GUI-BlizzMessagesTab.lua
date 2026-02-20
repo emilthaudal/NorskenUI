@@ -41,7 +41,7 @@ GUIFrame:RegisterContent("messages", function(scrollChild, yOffset)
     -- Apply settings through module
     local function ApplySettings()
         if BM and BM:IsEnabled() then
-            BM:Apply()
+            BM:ApplySettings()
         end
     end
 

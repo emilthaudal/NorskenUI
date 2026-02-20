@@ -45,9 +45,14 @@ local GATEWAY_ITEM_ID = 188152
 -- Module state
 GATE.isPreview = false
 
+-- Update db, used for profile changes
+function GATE:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.Gateway
+end
+
 -- Module init
 function GATE:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.Gateway
+    self:UpdateDB()
     self.wasUsable = false
     self.hasItem = false
     self.itemName = nil

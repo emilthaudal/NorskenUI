@@ -32,7 +32,7 @@ GUIFrame:RegisterContent("Automation", function(scrollChild, yOffset)
     -- Apply Automation settings
     local function ApplySettings()
         if AUTO then
-            AUTO:Apply()
+            AUTO:ApplySettings()
         end
     end
 

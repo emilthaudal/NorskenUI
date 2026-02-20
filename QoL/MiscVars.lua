@@ -41,9 +41,14 @@ MVAR.DEFS = {
     },
 }
 
+-- Update db, used for profile changes
+function MVAR:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.MiscVars
+end
+
 -- Module init
 function MVAR:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.MiscVars
+    self:UpdateDB()
     self:SyncFromCVars()
     self:SetEnabledState(false)
 end

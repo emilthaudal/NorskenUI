@@ -32,9 +32,14 @@ DR.secondWindFrame = nil
 DR.speedText = nil
 DR.isPreview = false
 
+-- Update db, used for profile changes
+function DR:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.DragonRiding
+end
+
 -- Module init
 function DR:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.DragonRiding
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

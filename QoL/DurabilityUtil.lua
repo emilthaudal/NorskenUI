@@ -20,9 +20,14 @@ local unpack = unpack
 local GetInventoryItemDurability = GetInventoryItemDurability
 local ipairs = ipairs
 
+-- Update db, used for profile changes
+function DUR:UpdateDB()
+    self.db = NRSKNUI.db.profile.Miscellaneous.Durability
+end
+
 -- Module init bruv
 function DUR:OnInitialize()
-    self.db = NRSKNUI.db.profile.Miscellaneous.Durability
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -37,11 +42,11 @@ local InvDurability = {}
 local Slots = { 1, 3, 5, 6, 7, 8, 9, 10, 16, 17, 18 }
 local offset = 10
 
-
 -- Durability status update
 function DUR:OnEvent()
     -- Skip real updates when in preview mode
     if self.isPreview then return end
+    if not self.db or not self.db.WarningText or not self.db.Text then return end
 
     local TotalDurability = 100
     wipe(InvDurability)
@@ -59,7 +64,7 @@ function DUR:OnEvent()
     end
 
     -- Dont show warning text unless specific min durability is met
-    if self.WarningFrame and self.db.WarningText.Enabled then
+    if self.WarningFrame and self.db.WarningText and self.db.WarningText.Enabled then
         if self.inCombat then
             if TotalDurability > self.db.WarningText.CombatShowPercent then
                 self.WarningFrame:Hide()
@@ -76,7 +81,7 @@ function DUR:OnEvent()
     end
 
     -- Color and update minimap text with current durability state
-    if self.Text and self.db.Text.Enabled then
+    if self.Text and self.db.Text and self.db.Text.Enabled then
         local r, g, b
         if self.db.Text.UseStatusColor then
             r, g, b = NRSKNUI:ColorGradient(TotalDurability, 100, unpack(GradientColorPalet))
@@ -117,6 +122,7 @@ end
 -- Update text, called from GUI
 function DUR:UpdateText()
     if not self.Frame then return end
+    if not self.db.Text then return end
     if not self.db.Text.Enabled and not self.isPreview then
         self.Frame:Hide()
         return
@@ -171,7 +177,7 @@ end
 -- Update warning text, called from GUI
 function DUR:UpdateWarning()
     if not self.WarningFrame then return end
-    if not self.db.WarningText.Enabled then
+    if not self.db.WarningText or not self.db.WarningText.Enabled then
         self.WarningFrame:Hide()
         return
     end
@@ -188,18 +194,32 @@ end
 
 -- Update font settings, called from GUI
 function DUR:UpdateFonts()
-    NRSKNUI:ApplyFontToText(self.WarningText, self.db.FontFace, self.db.WarningText.FontSize, self.db.FontOutline)
-    NRSKNUI:ApplyFontToText(self.Text, self.db.FontFace, self.db.Text.FontSize, self.db.FontOutline)
+    if not self.db then return end
 
-    local WTwidth, WTheight = self.WarningText:GetWidth(), self.WarningText:GetHeight()
-    self.WarningFrame:SetSize(WTwidth + offset, WTheight + offset)
+    if self.WarningText and self.WarningFrame and self.db.WarningText then
+        NRSKNUI:ApplyFontToText(self.WarningText, self.db.FontFace, self.db.WarningText.FontSize, self.db.FontOutline)
+        local WTwidth, WTheight = self.WarningText:GetWidth(), self.WarningText:GetHeight()
+        self.WarningFrame:SetSize(WTwidth + offset, WTheight + offset)
+    end
 
-    local DTwidth, DTheight = self.Text:GetWidth(), self.Text:GetHeight()
-    self.Frame:SetSize(DTwidth + offset, DTheight)
+    if self.Text and self.Frame and self.db.Text then
+        NRSKNUI:ApplyFontToText(self.Text, self.db.FontFace, self.db.Text.FontSize, self.db.FontOutline)
+        local DTwidth, DTheight = self.Text:GetWidth(), self.Text:GetHeight()
+        self.Frame:SetSize(DTwidth + offset, DTheight)
+    end
 
     C_Timer.After(0.1, function()
         DUR:OnEvent()
     end)
+end
+
+-- Exposed update function for GUI & profile changes
+function DUR:ApplySettings()
+    if not self.db then return end
+
+    self:UpdateWarning()
+    self:UpdateText()
+    self:UpdateFonts()
 end
 
 -- Register events
@@ -298,6 +318,8 @@ end
 
 -- Show preview for edit mode/GUI
 function DUR:ShowPreview()
+    if not self.db then return end
+
     if not self.Frame then
         self:Create()
     end
@@ -305,7 +327,7 @@ function DUR:ShowPreview()
         self:CreateWarning()
     end
     self.isPreview = true
-    if self.Frame and self.Text then
+    if self.Frame and self.Text and self.db.Text then
         self.Frame:Show()
         local durText = NRSKNUI:ColorText(self.db.Text.DurText, self.db.Text.DurColor)
         self.Text:SetText((durText .. "75%"))
@@ -319,8 +341,11 @@ end
 -- Hide preview
 function DUR:HidePreview()
     self.isPreview = false
+
+    if not self.db then return end
+
     if self.Frame then
-        if not self.db.Text.Enabled then
+        if not self.db.Text or not self.db.Text.Enabled then
             self.Frame:Hide()
         end
     end

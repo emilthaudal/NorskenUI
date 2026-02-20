@@ -169,9 +169,14 @@ function PET:UpdatePetText()
     end
 end
 
+-- Update db, used for profile changes
+function PET:UpdateDB()
+    self.db = NRSKNUI.db.profile.PetTexts
+end
+
 -- Module init
 function PET:OnInitialize()
-    self.db = NRSKNUI.db.profile.PetTexts
+    self:UpdateDB()
 
     local _, class = UnitClass("player")
     petInfo = PET_CLASSES[class]

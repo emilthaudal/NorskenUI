@@ -7,8 +7,6 @@ local addonName = select(1, ...)
 -- Localization
 local ipairs = ipairs
 local print = print
-local pcall = pcall
-local LibStub = LibStub
 local string_gsub = string.gsub
 local ReloadUI = ReloadUI
 local C_AddOns = C_AddOns
@@ -16,14 +14,10 @@ local EditModeManagerFrame = EditModeManagerFrame
 local _G = _G
 
 -- Libraries
-local function SafeLibStub(name)
-    local success, lib = pcall(LibStub, name)
-    return success and lib or nil
-end
-NRSKNUI.LSM = SafeLibStub("LibSharedMedia-3.0")
-NRSKNUI.LDB = SafeLibStub("LibDataBroker-1.1")
-NRSKNUI.LDBIcon = SafeLibStub("LibDBIcon-1.0")
-NRSKNUI.LDS = SafeLibStub("LibDualSpec-1.0")
+NRSKNUI.LSM = LibStub("LibSharedMedia-3.0")
+NRSKNUI.LDB = LibStub("LibDataBroker-1.1")
+NRSKNUI.LDBIcon = LibStub("LibDBIcon-1.0")
+NRSKNUI.LDS = LibStub("LibDualSpec-1.0")
 
 -- Standard addon font and statusbar
 NRSKNUI.PATH = ([[Interface\AddOns\%s\Media\]]):format(addonName)

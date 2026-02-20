@@ -101,9 +101,14 @@ local function BuildBarConfig(barKey, barDB, globalMouseover)
     }
 end
 
+-- Update db, used for profile changes
+function ACB:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.ActionBars
+end
+
 -- Module init
 function ACB:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.ActionBars
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

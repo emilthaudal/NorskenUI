@@ -35,9 +35,14 @@ CR.isPreview = false
 -- Cached settings for performance
 CR.cachedSettings = {}
 
+-- Update db, used for profile changes
+function CR:UpdateDB()
+    self.db = NRSKNUI.db.profile.BattleRes
+end
+
 -- Module init
 function CR:OnInitialize()
-    self.db = NRSKNUI.db.profile.BattleRes
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

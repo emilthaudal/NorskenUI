@@ -131,9 +131,14 @@ local echoLogo = "|T" .. logo .. ":16:16:0:0:64:64:5:59:7:57|t"
 local logoPaja = "Interface\\AddOns\\NorskenUI\\Media\\Pajala_Logo_trans.png"
 local PajaLogo = "|T" .. logoPaja .. ":16:16:0:0:64:64:5:59:7:57|t"
 
+-- Update db, used for profile changes
+function TT:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.Tooltips
+end
+
 -- Module init
 function TT:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.Tooltips
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -153,17 +158,21 @@ end
 
 -- Update backdrop settings
 function TT:UpdateBackdrop(backdrop)
+    if not self.db then return end
+
     -- Apply backdrop settings
     backdrop:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = self.db.BorderSize,
+        edgeSize = self.db.BorderSize or 1,
         insets = { left = 0, right = 0, top = 0, bottom = 0 },
     })
-    backdrop:SetBackdropColor(self.db.BackgroundColor[1], self.db.BackgroundColor[2], self.db.BackgroundColor[3],
-        self.db.BackgroundColor[4] or 0.8)
-    backdrop:SetBackdropBorderColor(self.db.BorderColor[1], self.db.BorderColor[2], self.db.BorderColor[3],
-        self.db.BorderColor[4] or 1)
+
+    local bgColor = self.db.BackgroundColor or { 0, 0, 0, 0.8 }
+    local borderColor = self.db.BorderColor or { 0, 0, 0, 1 }
+
+    backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
+    backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
 end
 
 -- Fetch color info from unit if unit is a player
@@ -566,6 +575,11 @@ function TT:Refresh()
             TT:UpdateBackdrop(backdrop)
         end
     end
+end
+
+-- ApplySettings
+function TT:ApplySettings()
+    self:Refresh()
 end
 
 -- Create our own anchor frame that we later use to anchor tooltip to

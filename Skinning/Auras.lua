@@ -19,9 +19,14 @@ local unpack = unpack
 local hooksecurefunc = hooksecurefunc
 local C_Timer = C_Timer
 
+-- Update db, used for profile changes
+function AURAS:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.BuffDebuffFrames
+end
+
 -- Module init
 function AURAS:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.BuffDebuffFrames
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
@@ -100,7 +105,7 @@ local function StyleAuraFrame(aura, size, borderColor)
         if not auraDuration.__nrsHooked then
             auraDuration.__nrsHooked = true
             hooksecurefunc(aura, "UpdateDuration", function()
-                if auraDuration then
+                if auraDuration and AURAS.db and AURAS.db.FontColor then
                     auraDuration:SetTextColor(unpack(AURAS.db.FontColor))
                 end
             end)
@@ -234,6 +239,13 @@ local function StyleExternalDefensives()
     ExternalDefensivesFrame:ClearAllPoints()
     ExternalDefensivesFrame:SetPoint("CENTER", UIParent, "CENTER", 0.1, 300.1)
     ExternalDefensivesFrame:SetFrameStrata("MEDIUM")
+end
+
+-- ApplySettings
+function AURAS:ApplySettings()
+    if self:IsEnabled() then
+        self:Refresh()
+    end
 end
 
 -- Full refresh

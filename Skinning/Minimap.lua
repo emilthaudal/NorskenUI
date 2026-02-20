@@ -35,9 +35,14 @@ local hooked = {
     bugSackButton = nil,
 }
 
+-- Update db, used for profile changes
+function MAP:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.Minimap
+end
+
 -- Module init
 function MAP:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.Minimap
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

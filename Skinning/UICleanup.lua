@@ -24,9 +24,14 @@ local ProfessionsRecipeTracker = ProfessionsRecipeTracker
 local AchievementObjectiveTracker = AchievementObjectiveTracker
 local CampaignQuestObjectiveTracker = CampaignQuestObjectiveTracker
 
+-- Update db, used for profile changes
+function UIC:UpdateDB()
+    self.db = NRSKNUI.db.profile.Skinning.UICleanup
+end
+
 -- Module init
 function UIC:OnInitialize()
-    self.db = NRSKNUI.db.profile.Skinning.UICleanup
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 

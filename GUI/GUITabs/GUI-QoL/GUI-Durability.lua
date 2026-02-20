@@ -36,8 +36,7 @@ local textWidgets = {}
 -- Apply Durability settings
 local function ApplySettings()
     if DUR then
-        DUR:UpdateWarning()
-        DUR:UpdateText()
+        DUR:ApplySettings()
     end
 end
 
@@ -177,10 +176,10 @@ local function RenderGeneralTab(scrollChild, yOffset, activeCards)
     table_insert(allWidgets, fontDropdown)
 
     local outlineList = {
-        { key = "NONE", text = "None" },
-        { key = "OUTLINE", text = "Outline" },
+        { key = "NONE",         text = "None" },
+        { key = "OUTLINE",      text = "Outline" },
         { key = "THICKOUTLINE", text = "Thick" },
-        { key = "SOFTOUTLINE", text = "Soft" },
+        { key = "SOFTOUTLINE",  text = "Soft" },
     }
     local outlineDropdown = GUIFrame:CreateDropdown(row2, "Outline", outlineList, db.FontOutline or "OUTLINE", 45,
         function(key)
@@ -350,7 +349,8 @@ local function RenderWarningTextTab(scrollChild, yOffset, activeCards)
     card1:AddRow(row1, 40)
 
     local row1a = GUIFrame:CreateRow(card1.content, 40)
-    local ShowPercent = GUIFrame:CreateSlider(row1a, "|cff4dff00Out of Combat|r Durability % Trigger", 1, 100, 1, WT.ShowPercent, 60,
+    local ShowPercent = GUIFrame:CreateSlider(row1a, "|cff4dff00Out of Combat|r Durability % Trigger", 1, 100, 1,
+        WT.ShowPercent, 60,
         function(val)
             WT.ShowPercent = val
             ApplyFonts()
@@ -359,7 +359,8 @@ local function RenderWarningTextTab(scrollChild, yOffset, activeCards)
     table_insert(allWidgets, ShowPercent)
     table_insert(warningWidgets, ShowPercent)
 
-    local CombatShowPercent = GUIFrame:CreateSlider(row1a, "|cffff0000In Combat|r Durability % Trigger", 0, 100, 1, WT.CombatShowPercent, 60,
+    local CombatShowPercent = GUIFrame:CreateSlider(row1a, "|cffff0000In Combat|r Durability % Trigger", 0, 100, 1,
+        WT.CombatShowPercent, 60,
         function(val)
             WT.CombatShowPercent = val
             ApplyFonts()

@@ -31,9 +31,14 @@ CM.noTargetCheckGeneration = 0
 CM.isPreview = false
 CM.inCombat = false
 
+-- Update db, used for profile changes
+function CM:UpdateDB()
+    self.db = NRSKNUI.db.profile.CombatMessage
+end
+
 -- Module init bruv
 function CM:OnInitialize()
-    self.db = NRSKNUI.db.profile.CombatMessage
+    self:UpdateDB()
     self:SetEnabledState(false)
 end
 
