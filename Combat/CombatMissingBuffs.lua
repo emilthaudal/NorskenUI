@@ -821,6 +821,12 @@ local function CheckStances()
         if not classSettings.ShadowEnabled then return end
         if currentSpecId ~= 258 then return end -- Shadow spec only
 
+        -- When you enter voidform cd, standard tracking is overriden and we cant check this in combat
+        -- This is fine since almost always, you would want to be in shadowform pre combat so we just return early here
+        if InCombatLockdown or C_ChallengeMode.IsChallengeModeActive() then
+            return
+        end
+
         -- Check for Shadowform
         local shadowformSpellId = 232698
         local hasShadowform = PlayerHasBuff(shadowformSpellId, { 194249 }) -- Shadowform or Voidform
