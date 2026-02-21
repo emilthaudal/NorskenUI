@@ -110,7 +110,10 @@ GUIFrame:RegisterContent("CooldownStrings", function(scrollChild, yOffset)
     card1:AddRow(row1, 36)
 
     -- Separator
-    card1:AddSeparator()
+    local row4asep = GUIFrame:CreateRow(card1.content, 8)
+    local seprow4aCard = GUIFrame:CreateSeparator(row4asep)
+    row4asep:AddWidget(seprow4aCard, 1)
+    card1:AddRow(row4asep, 8)
 
     -- Description text
     local textRowSize = 50
@@ -259,9 +262,6 @@ GUIFrame:RegisterContent("CooldownStrings", function(scrollChild, yOffset)
         table_insert(allWidgets, deleteBtn)
 
         card3:AddRow(row3a, 42)
-
-        -- Separator
-        --card3:AddSeparator()
 
         -- Row 2: Profile String EditBox (multiline)
         local row3b = GUIFrame:CreateRow(card3.content, 140)

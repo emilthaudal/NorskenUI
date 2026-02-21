@@ -349,7 +349,10 @@ GUIFrame:RegisterContent("BuffBars", function(scrollChild, yOffset)
         card3:AddRow(row3a, 40)
 
         -- Separator
-        card3:AddSeparator()
+        local row4asep = GUIFrame:CreateRow(card3.content, 8)
+        local seprow4aCard = GUIFrame:CreateSeparator(row4asep)
+        row4asep:AddWidget(seprow4aCard, 1)
+        card3:AddRow(row4asep, 8)
 
         -- Row 2: Type + Spell/Item ID + Duration
         local row3b = GUIFrame:CreateRow(card3.content, 40)
@@ -435,7 +438,7 @@ GUIFrame:RegisterContent("BuffBars", function(scrollChild, yOffset)
             end)
         row3e:AddWidget(reverseCheck, 0.5)
         table_insert(allWidgets, reverseCheck)
-                card3:AddRow(row3e, 36)
+        card3:AddRow(row3e, 36)
 
         yOffset = yOffset + card3:GetContentHeight() + Theme.paddingSmall
     else

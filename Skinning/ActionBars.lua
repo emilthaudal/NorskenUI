@@ -908,29 +908,37 @@ function ACB:OnEnable()
 
     -- Delay skinning until after Blizzard's initial setup to avoid taint issues and ensure all elements exist
     C_Timer.After(0.5, function()
+        -- Always hide Blizzard special bars when module is active
+        self:HideBlizzardBars()
+
+        -- Create all bars initally, then hide them based on config
+        -- this way a reload is not needed when swapping between profiles for example
         for _, cfg in ipairs(configTable) do
-            if cfg.enabled then
-                SkinBar(cfg)
-                SetupMouseoverScript(cfg.nrsknui_container)
-                RegisterBarWithEditMode(
-                    cfg.name,
-                    cfg.dbReference,
-                    cfg.nrsknui_container,
-                    cfg.relativeTo
-                )
+            SkinBar(cfg)
+            SetupMouseoverScript(cfg.nrsknui_container)
+            RegisterBarWithEditMode(
+                cfg.name,
+                cfg.dbReference,
+                cfg.nrsknui_container,
+                cfg.relativeTo
+            )
 
-                -- Setup bonusbar override for Bar1
-                if cfg.name == "Bar1" and cfg.nrsknui_container then
-                    SetupBonusBarOverride(cfg.nrsknui_container, self.db)
-                    self:UpdateBonusBarOverride() -- Send an update incase player is mounted when loading in
-                end
+            -- Setup bonusbar override for Bar1
+            if cfg.name == "Bar1" and cfg.nrsknui_container then
+                SetupBonusBarOverride(cfg.nrsknui_container, self.db)
+                self:UpdateBonusBarOverride()
+            end
 
-                -- Setup visibility handling for Pet and Stance bars
-                if cfg.name == "PetBar" and cfg.nrsknui_container then
-                    SetupPetBarVisibility(cfg.nrsknui_container)
-                elseif cfg.name == "StanceBar" and cfg.nrsknui_container then
-                    SetupStanceBarVisibility(cfg.nrsknui_container)
-                end
+            -- Setup visibility handling for Pet and Stance bars
+            if cfg.name == "PetBar" and cfg.nrsknui_container then
+                SetupPetBarVisibility(cfg.nrsknui_container)
+            elseif cfg.name == "StanceBar" and cfg.nrsknui_container then
+                SetupStanceBarVisibility(cfg.nrsknui_container)
+            end
+
+            -- Hide container if bar is disabled
+            if not cfg.enabled and cfg.nrsknui_container then
+                cfg.nrsknui_container:Hide()
             end
         end
 
@@ -1272,6 +1280,73 @@ function ACB:UpdateSettings(updateType, barKey)
             self:UpdateAllBackdropColors()
         end
     end
+end
+
+-- Hide Blizzard bar frames, called on enable and profile changes
+function ACB:HideBlizzardBars()
+    -- Hide special bars
+    if PetActionBar then
+        PetActionBar:SetParent(UIParent)
+        PetActionBar:ClearAllPoints()
+        PetActionBar:SetPoint("TOP", UIParent, "BOTTOM", 0, -500)
+        PetActionBar:EnableMouse(false)
+    end
+    if StanceBar then
+        StanceBar:SetParent(UIParent)
+        StanceBar:ClearAllPoints()
+        StanceBar:SetPoint("TOP", UIParent, "BOTTOM", 0, -500)
+        StanceBar:EnableMouse(false)
+    end
+
+    -- Hide regular Blizzard bar frames by yeeting them outside the screen
+    local blizzBars = { "MultiBar5", "MultiBar6", "MultiBar7" }
+    for _, barName in ipairs(blizzBars) do
+        local frame = _G[barName]
+        if frame then
+            frame:SetParent(UIParent)
+            frame:ClearAllPoints()
+            frame:SetPoint("TOP", UIParent, "BOTTOM", 0, -500)
+            frame:EnableMouse(false)
+        end
+    end
+end
+
+-- Apply all settings, standard module interface
+function ACB:ApplySettings()
+    C_Timer.After(0.1, function()
+        if InCombatLockdown() then return end
+        self:HideBlizzardBars()
+
+        -- Re-apply Blizzard actionbar settings
+        for i = 2, 8 do
+            Settings.SetValue("PROXY_SHOW_ACTIONBAR_" .. i, false)
+        end
+
+        -- Rebuild config with new profile settings
+        self:BuildConfigTable()
+
+        -- Update existing containers and handle enabled state
+        for barKey, _ in pairs(BAR_FRAME_MAP) do
+            local barDB = self.db.Bars and self.db.Bars[barKey]
+            local container = _G["NRSKNUI_" .. barKey .. "_Container"]
+
+            if container then
+                -- Container exists, update its enabled state
+                if barDB and barDB.Enabled then
+                    container:Show()
+                    -- Trigger visibility update for special bars
+                    if container._visibilityFrame then
+                        container._visibilityFrame:GetScript("OnEvent")(container._visibilityFrame, "PLAYER_ENTERING_WORLD")
+                    end
+                else
+                    container:Hide()
+                end
+            end
+        end
+
+        self:UpdateSettings("all")
+        self:UpdateAllBackdropColors()
+    end)
 end
 
 -- Update backdrop colors and visibility for a bar

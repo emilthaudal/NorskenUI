@@ -148,7 +148,11 @@ GUIFrame:RegisterContent("ProfileManager", function(scrollChild, yOffset)
     row3a:AddWidget(createBtn, 0.35, nil, 0, -14)
     card3:AddRow(row3a, 40)
 
-    card3:AddSeparator()
+    -- Separator
+    local row3asep = GUIFrame:CreateRow(card3.content, 8)
+    local seprow5Card = GUIFrame:CreateSeparator(row3asep)
+    row3asep:AddWidget(seprow5Card, 1)
+    card3:AddRow(row3asep, 8)
 
     -- Copy Profile
     card3:AddLabel("Copy From Profile")
@@ -186,7 +190,11 @@ GUIFrame:RegisterContent("ProfileManager", function(scrollChild, yOffset)
     row3b:AddWidget(copyBtn, 0.35, nil, 0, -14)
     card3:AddRow(row3b, 40)
 
-    card3:AddSeparator()
+    -- Separator
+    local row3bsep = GUIFrame:CreateRow(card3.content, 8)
+    local seprow3bCard = GUIFrame:CreateSeparator(row3bsep)
+    row3bsep:AddWidget(seprow3bCard, 1)
+    card3:AddRow(row3bsep, 8)
 
     -- Delete Profile
     card3:AddLabel("Delete Profile")
@@ -234,7 +242,11 @@ GUIFrame:RegisterContent("ProfileManager", function(scrollChild, yOffset)
     row3c:AddWidget(deleteBtn, 0.35, nil, 0, -14)
     card3:AddRow(row3c, 40)
 
-    card3:AddSeparator()
+    -- Separator
+    local row3dsep = GUIFrame:CreateRow(card3.content, 8)
+    local seprow3dCard = GUIFrame:CreateSeparator(row3dsep)
+    row3dsep:AddWidget(seprow3dCard, 1)
+    card3:AddRow(row3dsep, 8)
 
     -- Reset Profile
     local row3d = GUIFrame:CreateRow(card3.content, 36)
@@ -290,7 +302,11 @@ GUIFrame:RegisterContent("ProfileManager", function(scrollChild, yOffset)
     row4a:AddWidget(exportBtn, 1)
     card4:AddRow(row4a, 36)
 
-    card4:AddSeparator()
+    -- Separator
+    local row4asep = GUIFrame:CreateRow(card4.content, 8)
+    local seprow4aCard = GUIFrame:CreateSeparator(row4asep)
+    row4asep:AddWidget(seprow4aCard, 1)
+    card4:AddRow(row4asep, 8)
 
     -- Import section
     card4:AddLabel("Import Profile")
@@ -336,10 +352,6 @@ GUIFrame:RegisterContent("ProfileManager", function(scrollChild, yOffset)
     })
     row4c:AddWidget(importBtn, 1)
     card4:AddRow(row4c, 36)
-
-    local importNote = card4:AddLabel(
-        "Imported profiles are created as new profiles. If the name exists, a number will be appended.")
-    importNote:SetTextColor(Theme.textMuted[1], Theme.textMuted[2], Theme.textMuted[3], 1)
 
     yOffset = yOffset + card4:GetContentHeight() + Theme.paddingSmall
 
