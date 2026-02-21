@@ -676,20 +676,3 @@ function NRSKNUI:ApplyThemeFont(fontString, size)
         fontString:SetShadowColor(0, 0, 0, 0)
     end
 end
-
--- GetAccentColor: Get accent color based on a color mode setting
-function NRSKNUI:GetAccentColor(mode, customColor)
-    if mode == "class" then
-        local _, class = UnitClass("player")
-        if class and RAID_CLASS_COLORS[class] then
-            local c = RAID_CLASS_COLORS[class]
-            return c.r, c.g, c.b, 1
-        end
-    elseif mode == "custom" and customColor then
-        return customColor[1] or 1, customColor[2] or 1, customColor[3] or 1, customColor[4] or 1
-    end
-
-    -- Default to theme accent
-    local accent = self.Theme.accent
-    return accent[1], accent[2], accent[3], accent[4]
-end
