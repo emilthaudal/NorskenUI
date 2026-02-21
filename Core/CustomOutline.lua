@@ -53,14 +53,15 @@ local ALPHA_STRENGTH = {
     1.0, 0.7,
 }
 
--- Strip WoW color codes from text for solid outline
--- We do this so that the actual text color when |cAARRGGBB|r format is used
--- does not "bleed" into the outline
-local function StripColorCodes(text)
+-- Strip WoW escape codes from text for solid outline
+-- We do this so that colored text and embedded textures don't appear in the outline shadows
+local function StripEscapeCodes(text)
     if not text then return "" end
-    text = text:gsub("|c%x%x%x%x%x%x%x%x", "") -- Remove |cAARRGGBB
-    text = text:gsub("|r", "")                 -- Remove |r (reset)
-    return text                                -- Return cleaned text
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", "") -- Remove |cAARRGGBB (color start)
+    text = text:gsub("|r", "")                 -- Remove |r (color reset)
+    text = text:gsub("|T.-|t", "")             -- Remove |T...|t (textures)
+    text = text:gsub("|A.-|a", "")             -- Remove |A...|a (atlas textures)
+    return text
 end
 
 -- Internal Helpers
@@ -92,7 +93,7 @@ end
 -- Public API
 function SoftOutline:SetText(text)
     if not self.shadows then return end
-    local cleanText = StripColorCodes(text)
+    local cleanText = StripEscapeCodes(text)
     for _, shadow in ipairs(self.shadows) do
         shadow:SetText(cleanText)
     end
@@ -405,7 +406,7 @@ function NRSKNUI:CreateSoftOutline(mainText, options)
     for i = 1, #SHADOW_OFFSETS do
         local shadow = parent:CreateFontString(nil, "ARTWORK", nil, 7)
         shadow:SetFont(font, size, "")
-        shadow:SetText(StripColorCodes(mainText:GetText() or ""))
+        shadow:SetText(StripEscapeCodes(mainText:GetText() or ""))
         shadow:SetJustifyH(mainText:GetJustifyH())
         shadow:SetJustifyV(mainText:GetJustifyV())
 
