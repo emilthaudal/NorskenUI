@@ -344,12 +344,23 @@ function DUR:HidePreview()
 
     if not self.db then return end
 
+    -- If main module is disabled, hide everything
+    if not self.db.Enabled then
+        if self.Frame then self.Frame:Hide() end
+        if self.WarningFrame then self.WarningFrame:Hide() end
+        return
+    end
+
     if self.Frame then
         if not self.db.Text or not self.db.Text.Enabled then
             self.Frame:Hide()
         end
     end
     if self.WarningFrame then
-        self:OnEvent()
+        if not self.db.WarningText or not self.db.WarningText.Enabled then
+            self.WarningFrame:Hide()
+        else
+            self:OnEvent()
+        end
     end
 end
