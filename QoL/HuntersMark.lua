@@ -15,11 +15,16 @@ local HUNTMARK = NorskenUI:NewModule("HuntersMark")
 -- Localization
 local CreateFrame = CreateFrame
 local UnitExists = UnitExists
+local UnitClass = UnitClass
 local UnitIsBossMob = UnitIsBossMob
 local InCombatLockdown = InCombatLockdown
 local IsInInstance = IsInInstance
 local next = next
 local wipe = wipe
+
+-- Class check
+local _, playerClass = UnitClass("player")
+local isHunter = playerClass == "HUNTER"
 
 -- Module locals
 local SPELL_ID = 257284 -- Hunter's Mark
@@ -234,6 +239,7 @@ end
 
 -- Module OnEnable
 function HUNTMARK:OnEnable()
+    if not isHunter then return end
     if not self.db.Enabled then return end
 
     self:StartScanning()
