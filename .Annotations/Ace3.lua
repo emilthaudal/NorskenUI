@@ -14,6 +14,8 @@
 ---@field SetDefaultModulePrototype fun(self: AceAddon-3.0, prototype: table)
 ---@field SetEnabledState fun(self: AceAddon-3.0, state: boolean)
 ---@field IsEnabled fun(self: AceAddon-3.0): boolean
+---@field ApplySettings fun(self: AceAddon-3.0): AceModule
+---@field UpdateDB fun(self: AceAddon-3.0): AceModule
 
 ---@class AceEvent-3.0
 ---@field RegisterEvent fun(self: any, event: string, callbackOrMethod?: string|function)
