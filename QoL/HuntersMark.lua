@@ -21,6 +21,7 @@ local InCombatLockdown = InCombatLockdown
 local IsInInstance = IsInInstance
 local next = next
 local wipe = wipe
+local type = type
 
 -- Class check
 local _, playerClass = UnitClass("player")
@@ -151,14 +152,19 @@ function HUNTMARK:StartScanning()
         if event == "PLAYER_ENTERING_WORLD" then
             C_Timer.After(0.5, function()
                 self:SetScanningActive(IsInRaid())
-                return
             end)
+            return
         end
+
+        -- Only process other events when in a raid
+        if not IsInRaid() then return end
 
         if event == "PLAYER_REGEN_DISABLED" then
             self.frame:Hide()
             return
-        elseif event == "PLAYER_REGEN_ENABLED" then
+        end
+
+        if event == "PLAYER_REGEN_ENABLED" then
             -- Rescan when leaving combat
             wipe(markedUnits)
             for _, namePlate in next, C_NamePlate.GetNamePlates() do
@@ -171,10 +177,13 @@ function HUNTMARK:StartScanning()
 
         if InCombatLockdown() then return end
 
+        -- Validate unit is a string before processing
+        if type(unit) ~= "string" then return end
+
         if event == "NAME_PLATE_UNIT_REMOVED" then
             markedUnits[unit] = nil
             self:UpdateWarningDisplay()
-        else
+        elseif event == "NAME_PLATE_UNIT_ADDED" or event == "UNIT_AURA" then
             self:CheckUnitForMark(unit)
         end
     end)
