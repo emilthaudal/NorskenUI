@@ -11,4 +11,5 @@
     <Script file="FocusCastbar.lua"/>
     <Script file="GateUsable.lua"/>
     <Script file="MiscVars.lua"/>
+    <Script file="HuntersMark.lua"/>
 </Ui>

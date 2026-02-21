@@ -24,6 +24,9 @@
     <!-- GUI Theme Page -->
     <Script file="GUITabs\GUI-ThemePage.lua" />
 
+    <!-- GUI Profiles Tab -->
+    <Script file="GUITabs\GUI-ProfilesTab.lua" />
+
     <!-- GUI Combat Tabs -->
     <Script file="GUITabs\GUI-Combat\GUI-CombatTimerTab.lua" />
     <Script file="GUITabs\GUI-Combat\GUI-CombatCrossTab.lua" />
@@ -44,6 +47,7 @@
     <Script file="GUITabs\GUI-QoL\GUI-CooldownStrings.lua" />
     <Script file="GUITabs\GUI-QoL\GUI-FocusCastbar.lua" />
     <Script file="GUITabs\GUI-QoL\GUI-CVars.lua" />
+    <Script file="GUITabs\GUI-QoL\GUI-HuntersMark.lua" />
 
     <!-- GUI Skinning Tabs -->
     <Script file="GUITabs\GUISkinning\GUI-TooltipsTab.lua" />

@@ -240,6 +240,25 @@ local Defaults = {
 
         -- Miscellaneous Settings
         Miscellaneous = {
+            HuntersMark = {
+                Enabled = true,
+                Color = { 1, 0.278, 0.392, 1 },
+                -- Font settings
+                FontFace = "Expressway",      -- Font face
+                FontSize = 22,                -- Font size
+                FontOutline = "SOFTOUTLINE",  -- Font outline (NONE, OUTLINE, THICKOUTLINE)
+                -- Position settings
+                Strata = "HIGH",              -- Frame strata
+                anchorFrameType = "UIPARENT", -- Anchor frame type
+                ParentFrame = "UIParent",     -- Parent frame name
+                Position = {                  -- Position settings
+                    AnchorFrom = "CENTER",    -- Anchor point from
+                    AnchorTo = "CENTER",      -- Anchor point to
+                    XOffset = 0,              -- X offset
+                    YOffset = 75,             -- Y offset
+                },
+            },
+
             MiscVars = {
                 Enabled = true,
 

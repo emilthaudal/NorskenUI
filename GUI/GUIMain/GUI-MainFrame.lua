@@ -34,6 +34,15 @@ GUIFrame.sidebarExpanded = GUIFrame.sidebarExpanded or {}
 GUIFrame.SidebarConfig = {
     systems = {
         {
+            id = "profiles_section",
+            type = "header",
+            text = "• Profiles",
+            defaultExpanded = true,
+            items = {
+                { id = "ProfileManager", text = "Profile Manager" },
+            }
+        },
+        {
             id = "combat_section",
             type = "header",
             text = "• Combat",
@@ -46,6 +55,7 @@ GUIFrame.SidebarConfig = {
                 { id = "combatMessage", text = "Combat Texts" },
                 { id = "PetTexts",      text = "Pet Status Texts" },
                 { id = "gateway",       text = "Gateway Alert" },
+                { id = "FocusCastbar",  text = "Focus Castbar" },
             }
         },
         {
@@ -70,10 +80,12 @@ GUIFrame.SidebarConfig = {
                 { id = "CooldownStrings", text = "CDM Profile Strings" },
                 { id = "whisperSounds",   text = "Whisper Sounds" },
                 { id = "DragonRiding",    text = "Dragon Riding UI" },
-                { id = "FocusCastbar",    text = "Focus Castbar" },
                 { id = "missingBuffs",    text = "Missing Buffs" },
                 { id = "XPBar",           text = "XP Bar" },
                 { id = "Durability",      text = "Durability Util" },
+                { id = "HuntersMark",     text = "Hunters Mark Missing" },
+
+
             }
         },
         {
