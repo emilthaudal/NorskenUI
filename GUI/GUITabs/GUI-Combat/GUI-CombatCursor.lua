@@ -391,15 +391,25 @@ GUIFrame:RegisterContent("cursorCircle", function(scrollChild, yOffset)
     local card2 = GUIFrame:CreateCard(scrollChild, "Main Ring Settings", yOffset)
     table_insert(allWidgets, card2)
 
-    -- Size slider
+    -- Size slider + Visibility Mode
     local row2a = GUIFrame:CreateRow(card2.content, 39)
     local sizeSlider = GUIFrame:CreateSlider(row2a, "Size", 20, 150, 1, db.Size or 50, 60,
         function(val)
             db.Size = val
             ApplySettings()
         end)
-    row2a:AddWidget(sizeSlider, 1)
+    row2a:AddWidget(sizeSlider, 0.5)
     table_insert(allWidgets, sizeSlider)
+
+    -- Visibility Mode dropdown
+    local visModeDropdown = GUIFrame:CreateDropdown(row2a, "Visibility", CC.VisibilityModeOptions,
+        db.VisibilityMode or "always", 120,
+        function(key)
+            db.VisibilityMode = key
+            ApplySettings()
+        end)
+    row2a:AddWidget(visModeDropdown, 0.5)
+    table_insert(allWidgets, visModeDropdown)
     card2:AddRow(row2a, 39)
 
     -- Color Mode dropdown

@@ -16,6 +16,7 @@ local CC = NorskenUI:NewModule("CursorCircle", "AceEvent-3.0")
 local CreateFrame = CreateFrame
 local GetCursorPosition = GetCursorPosition
 local InCombatLockdown = InCombatLockdown
+local IsMouseButtonDown = IsMouseButtonDown
 local C_Spell = C_Spell
 local UIParent = UIParent
 
@@ -44,6 +45,12 @@ CC.GCDModeOptions = {
     ["disabled"] = "Disabled",
     ["integrated"] = "Integrated (overlay on circle)",
     ["separate"] = "Separate (own ring)",
+}
+
+-- Visibility Mode options for GUI
+CC.VisibilityModeOptions = {
+    ["always"] = "Always Visible",
+    ["mouseDown"] = "Only When Mouse Button Held",
 }
 
 -- Module state
@@ -107,6 +114,7 @@ function CC:CreateFrame()
 
     -- OnUpdate for cursor following
     local updateElapsed = 0
+    local mouseHoldTime = 0
     f:SetScript("OnUpdate", function(frame, elapsed)
         local useThrottle = db.UseUpdateInterval
         if useThrottle then
@@ -120,6 +128,23 @@ function CC:CreateFrame()
         local scale = frame:GetEffectiveScale()
         frame:ClearAllPoints()
         frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+
+        -- Handle visibility mode
+        local visMode = db.VisibilityMode or "always"
+        if visMode == "mouseDown" then
+            local isMouseDown = IsMouseButtonDown("LeftButton") or IsMouseButtonDown("RightButton")
+            local r, g, b, a = NRSKNUI:GetAccentColor(db.ColorMode, db.Color)
+
+            if isMouseDown then
+                mouseHoldTime = mouseHoldTime + elapsed
+                if mouseHoldTime >= 0.15 then
+                    frame.texture:SetVertexColor(r, g, b, a)
+                end
+            else
+                mouseHoldTime = 0
+                frame.texture:SetVertexColor(r, g, b, 0)
+            end
+        end
     end)
 
     self.frame = f
@@ -162,6 +187,7 @@ function CC:CreateGCDRing()
 
     -- OnUpdate for cursor following
     local updateElapsed = 0
+    local mouseHoldTime = 0
     gf:SetScript("OnUpdate", function(frame, elapsed)
         local useThrottle = db.UseUpdateInterval
         if useThrottle then
@@ -175,6 +201,24 @@ function CC:CreateGCDRing()
         local scale = frame:GetEffectiveScale()
         frame:ClearAllPoints()
         frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x / scale, y / scale)
+
+        -- Handle visibility mode
+        local visMode = db.VisibilityMode or "always"
+        if visMode == "mouseDown" then
+            local isMouseDown = IsMouseButtonDown("LeftButton") or IsMouseButtonDown("RightButton")
+            local gcd = db.GCD or {}
+            local r, g, b, a = NRSKNUI:GetAccentColor(gcd.RingColorMode or "theme", gcd.RingColor)
+
+            if isMouseDown then
+                mouseHoldTime = mouseHoldTime + elapsed
+                if mouseHoldTime >= 0.15 then
+                    frame.texture:SetVertexColor(r, g, b, a)
+                end
+            else
+                mouseHoldTime = 0
+                frame.texture:SetVertexColor(r, g, b, 0)
+            end
+        end
     end)
 
     self.gcdFrame = gf
@@ -184,8 +228,16 @@ end
 -- Apply color to the cursor circle
 function CC:ApplyColor()
     if not self.frame or not self.frame.texture then return end
-    local r, g, b, a = NRSKNUI:GetAccentColor(self.db.ColorMode, self.db.Color)
-    self.frame.texture:SetVertexColor(r, g, b, a)
+    local db = self.db
+    local r, g, b, a = NRSKNUI:GetAccentColor(db.ColorMode, db.Color)
+
+    -- If mouseDown mode, start with alpha 0
+    local visMode = db.VisibilityMode or "always"
+    if visMode == "mouseDown" then
+        self.frame.texture:SetVertexColor(r, g, b, 0)
+    else
+        self.frame.texture:SetVertexColor(r, g, b, a)
+    end
 end
 
 -- Apply color to GCD ring
@@ -196,10 +248,18 @@ function CC:ApplyGCDColor()
     local ringR, ringG, ringB, ringA = NRSKNUI:GetAccentColor(gcd.RingColorMode or "theme", gcd.RingColor)
     local swipeR, swipeG, swipeB, swipeA = NRSKNUI:GetAccentColor(gcd.SwipeColorMode or "custom", gcd.SwipeColor)
 
+    -- Check visibility mode
+    local visMode = db.VisibilityMode or "always"
+
     -- Apply to separate GCD frame
     if self.gcdFrame then
         if self.gcdFrame.texture then
-            self.gcdFrame.texture:SetVertexColor(ringR, ringG, ringB, ringA)
+            -- If mouseDown mode, start with alpha 0
+            if visMode == "mouseDown" then
+                self.gcdFrame.texture:SetVertexColor(ringR, ringG, ringB, 0)
+            else
+                self.gcdFrame.texture:SetVertexColor(ringR, ringG, ringB, ringA)
+            end
         end
         if self.gcdFrame.gcdCooldown then
             self.gcdFrame.gcdCooldown:SetSwipeColor(swipeR, swipeG, swipeB, swipeA)
