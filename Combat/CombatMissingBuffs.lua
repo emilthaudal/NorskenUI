@@ -842,7 +842,7 @@ local function CheckStances()
     local classSettings = stancesDb[playerClass]
     if not classSettings then return end
 
-    -- Special handling for Priest
+    -- Special handling for Priest (Shadow only, simple toggle)
     if playerClass == "PRIEST" then
         if not classSettings.ShadowEnabled then return end
         if currentSpecId ~= 258 then return end -- Shadow spec only
@@ -861,16 +861,67 @@ local function CheckStances()
         end
         return
     end
+
+    -- Special handling for Druid
+    if playerClass == "DRUID" then
+        -- Map spec IDs to their toggle key and required form
+        local druidSpecs = {
+            [102] = { toggleKey = "BalanceEnabled", spellId = 24858 }, 
+            [103] = { toggleKey = "FeralEnabled", spellId = 768 },
+            [104] = { toggleKey = "GuardianEnabled", spellId = 5487 },
+        }
+
+        local specData = druidSpecs[currentSpecId]
+        if not specData then return end
+        if not classSettings[specData.toggleKey] then return end
+
+        -- Get current form
+        local currentForm = GetShapeshiftForm()
+        local currentSpellId = nil
+        if currentForm > 0 then
+            local _, _, _, formSpellId = GetShapeshiftFormInfo(currentForm)
+            currentSpellId = formSpellId
+        end
+
+        -- Check if missing required form
+        if currentSpellId ~= specData.spellId then
+            if IsSpellKnown(specData.spellId) then
+                ShowStanceIcon(specData.spellId)
+            end
+        end
+        return
+    end
+
+    -- Special handling for Evoker
+    if playerClass == "EVOKER" then
+        if not classSettings.AugmentationEnabled then return end
+        if currentSpecId ~= 1473 then return end
+
+        local requiredSpellId = tonumber(classSettings.Augmentation) or 403264
+
+        -- Check if has attunement buff
+        local hasAttunement = PlayerHasBuff(requiredSpellId)
+        if not hasAttunement and IsSpellKnown(requiredSpellId) then
+            ShowStanceIcon(requiredSpellId)
+        end
+        return
+    end
+
+    -- Warrior and Paladin use the full class toggle + per-spec toggle + dropdown pattern
     -- Check if class toggle is enabled
     local classEnabled = classSettings.Enabled ~= false
+
     -- Check if spec-specific requirement is enabled
     local specEnabledKey = specName and (specName .. "Enabled")
     local specEnabled = specEnabledKey and classSettings[specEnabledKey] and true or false
     local requiredStanceId = specName and classSettings[specName] and tonumber(classSettings[specName])
     local reverseIconKey = specName and (specName .. "ReverseIcon")
     local reverseIcon = reverseIconKey and classSettings[reverseIconKey] and true or false
-    -- If neither class nor spec tracking is enabled, skip
-    if not classEnabled and not specEnabled then return end
+
+    -- If main class toggle is disabled, skip tracking
+    if not classEnabled then return end
+    if not specEnabled then return end
+
     -- Get current form/stance
     local currentForm = GetShapeshiftForm()
     local currentSpellId = nil

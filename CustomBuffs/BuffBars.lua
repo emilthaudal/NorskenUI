@@ -347,10 +347,10 @@ function BB:ShowTracker(trackerIndex)
     local config = frame.config
     frame.endTime = GetTime() + config.Duration
 
-    frame.bar:SetMinMaxValues(0, config.Duration)
+    frame.bar:SetMinMaxValues(0.0, config.Duration)
     if config.Reverse then
-        frame.bar:SetValue(0, Enum.StatusBarInterpolation.Immediate)
-        frame.lastBarValue = 0
+        frame.bar:SetValue(0.0, Enum.StatusBarInterpolation.Immediate)
+        frame.lastBarValue = 0.0
     else
         frame.bar:SetValue(config.Duration, Enum.StatusBarInterpolation.Immediate)
         frame.lastBarValue = config.Duration
@@ -376,10 +376,10 @@ function BB:ShowTrackerPreview(trackerIndex)
     local config = frame.config
     frame.endTime = GetTime() + config.Duration
 
-    frame.bar:SetMinMaxValues(0, config.Duration)
+    frame.bar:SetMinMaxValues(0.0, config.Duration)
     if config.Reverse then
-        frame.bar:SetValue(0, Enum.StatusBarInterpolation.Immediate)
-        frame.lastBarValue = 0
+        frame.bar:SetValue(0.0, Enum.StatusBarInterpolation.Immediate)
+        frame.lastBarValue = 0.0
     else
         frame.bar:SetValue(config.Duration, Enum.StatusBarInterpolation.Immediate)
         frame.lastBarValue = config.Duration

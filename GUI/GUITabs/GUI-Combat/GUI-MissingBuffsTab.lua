@@ -695,15 +695,105 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     yOffset = CreateClassStanceCard(scrollChild, yOffset, "PALADIN", "Paladin Auras",
         CLASS_ICONS.PALADIN, db.Stances, activeCards)
 
-    -- Druid
-    yOffset = CreateClassStanceCard(scrollChild, yOffset, "DRUID", "Druid Forms",
-        CLASS_ICONS.DRUID, db.Stances, activeCards)
+    -- Druid Forms (simple toggles per spec)
+    db.Stances.DRUID = db.Stances.DRUID or {}
+    local druidCard = GUIFrame:CreateCard(scrollChild, "Druid Forms", yOffset)
+    table_insert(activeCards, druidCard)
+    table_insert(allWidgets, druidCard)
 
-    -- Evoker
-    yOffset = CreateClassStanceCard(scrollChild, yOffset, "EVOKER", "Evoker Attunements",
-        CLASS_ICONS.EVOKER, db.Stances, activeCards)
+    -- Balance - Moonkin Form
+    local balanceRow = GUIFrame:CreateRow(druidCard.content, 40)
+    local balanceIcon = CreateIconWidget(balanceRow, SPEC_ICONS.DRUID.Balance, 40)
+    balanceRow:AddWidget(balanceIcon, 0.1)
 
-    -- Priest, simple single toggle, no class toggle or dropdown needed
+    local balanceToggle = GUIFrame:CreateCheckbox(balanceRow, "Balance: Require Moonkin Form", db.Stances.DRUID.BalanceEnabled == true,
+        function(checked)
+            db.Stances.DRUID.BalanceEnabled = checked
+            Refresh()
+        end)
+    balanceRow:AddWidget(balanceToggle, 0.9)
+    table_insert(allWidgets, balanceToggle)
+    druidCard:AddRow(balanceRow, 40)
+
+    -- Separator
+    local druidSep1 = GUIFrame:CreateRow(druidCard.content, 8)
+    local druidSep1Widget = GUIFrame:CreateSeparator(druidSep1)
+    druidSep1:AddWidget(druidSep1Widget, 1)
+    table_insert(allWidgets, druidSep1Widget)
+    druidCard:AddRow(druidSep1, 8)
+
+    -- Feral - Cat Form
+    local feralRow = GUIFrame:CreateRow(druidCard.content, 40)
+    local feralIcon = CreateIconWidget(feralRow, SPEC_ICONS.DRUID.Feral, 40)
+    feralRow:AddWidget(feralIcon, 0.1)
+
+    local feralToggle = GUIFrame:CreateCheckbox(feralRow, "Feral: Require Cat Form", db.Stances.DRUID.FeralEnabled == true,
+        function(checked)
+            db.Stances.DRUID.FeralEnabled = checked
+            Refresh()
+        end)
+    feralRow:AddWidget(feralToggle, 0.9)
+    table_insert(allWidgets, feralToggle)
+    druidCard:AddRow(feralRow, 40)
+
+    -- Separator
+    local druidSep2 = GUIFrame:CreateRow(druidCard.content, 8)
+    local druidSep2Widget = GUIFrame:CreateSeparator(druidSep2)
+    druidSep2:AddWidget(druidSep2Widget, 1)
+    table_insert(allWidgets, druidSep2Widget)
+    druidCard:AddRow(druidSep2, 8)
+
+    -- Guardian - Bear Form
+    local guardianRow = GUIFrame:CreateRow(druidCard.content, 40)
+    local guardianIcon = CreateIconWidget(guardianRow, SPEC_ICONS.DRUID.Guardian, 40)
+    guardianRow:AddWidget(guardianIcon, 0.1)
+
+    local guardianToggle = GUIFrame:CreateCheckbox(guardianRow, "Guardian: Require Bear Form", db.Stances.DRUID.GuardianEnabled == true,
+        function(checked)
+            db.Stances.DRUID.GuardianEnabled = checked
+            Refresh()
+        end)
+    guardianRow:AddWidget(guardianToggle, 0.9)
+    table_insert(allWidgets, guardianToggle)
+    druidCard:AddRow(guardianRow, 40)
+
+    yOffset = yOffset + druidCard:GetContentHeight() + Theme.paddingSmall
+
+    -- Evoker Attunement (toggle + dropdown)
+    db.Stances.EVOKER = db.Stances.EVOKER or {}
+    local evokerCard = GUIFrame:CreateCard(scrollChild, "Augmentation Evoker Attunement", yOffset)
+    table_insert(activeCards, evokerCard)
+    table_insert(allWidgets, evokerCard)
+
+    local evokerRow = GUIFrame:CreateRow(evokerCard.content, 40)
+    local evokerIcon = CreateIconWidget(evokerRow, SPEC_ICONS.EVOKER.Augmentation, 40)
+    evokerRow:AddWidget(evokerIcon, 0.1)
+
+    local evokerToggle = GUIFrame:CreateCheckbox(evokerRow, "Require Attunement", db.Stances.EVOKER.AugmentationEnabled == true,
+        function(checked)
+            db.Stances.EVOKER.AugmentationEnabled = checked
+            Refresh()
+        end)
+    evokerRow:AddWidget(evokerToggle, 0.5)
+    table_insert(allWidgets, evokerToggle)
+
+    local attunementOptions = {
+        { key = "403264", text = "Black Attunement" },
+        { key = "403265", text = "Bronze Attunement" },
+    }
+    local evokerDropdown = GUIFrame:CreateDropdown(evokerRow, "Required", attunementOptions,
+        db.Stances.EVOKER.Augmentation or "403264", 100,
+        function(key)
+            db.Stances.EVOKER.Augmentation = key
+            Refresh()
+        end)
+    evokerRow:AddWidget(evokerDropdown, 0.4)
+    table_insert(allWidgets, evokerDropdown)
+    evokerCard:AddRow(evokerRow, 40)
+
+    yOffset = yOffset + evokerCard:GetContentHeight() + Theme.paddingSmall
+
+    -- Priest (Shadow only - simple single toggle)
     db.Stances.PRIEST = db.Stances.PRIEST or {}
     local priestCard = GUIFrame:CreateCard(scrollChild, "Shadow Priest Shadowform", yOffset)
     table_insert(activeCards, priestCard)
