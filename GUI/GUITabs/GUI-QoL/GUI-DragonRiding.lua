@@ -270,6 +270,34 @@ GUIFrame:RegisterContent("DragonRiding", function(scrollChild, yOffset)
         yOffset = yOffset + card4:GetContentHeight() + Theme.paddingSmall
     end
 
+    ----------------------------------------------------------------
+    -- Card 5: Position Settings
+    ----------------------------------------------------------------
+    local card5, newOffset = GUIFrame:CreatePositionCard(scrollChild, yOffset, {
+        db = db,
+        dbKeys = {
+            anchorFrameType = "anchorFrameType",
+            anchorFrameFrame = "ParentFrame",
+            selfPoint = "AnchorFrom",
+            anchorPoint = "AnchorTo",
+            xOffset = "XOffset",
+            yOffset = "YOffset",
+            strata = "Strata",
+        },
+        showAnchorFrameType = false,
+        showStrata = true,
+        onChangeCallback = ApplySettings,
+    })
+
+    if card5.positionWidgets then
+        for _, widget in ipairs(card5.positionWidgets) do
+            table_insert(allWidgets, widget)
+        end
+    end
+    table_insert(allWidgets, card5)
+
+    yOffset = newOffset
+
     -- Apply initial widget states
     UpdateAllWidgetStates()
     yOffset = yOffset - Theme.paddingSmall
