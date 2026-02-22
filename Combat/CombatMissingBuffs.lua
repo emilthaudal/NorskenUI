@@ -122,16 +122,16 @@ local CLASS_STANCES = {
 -- Custom buff table
 local CUSTOM_BUFFS = {
     -- Midnight Flasks
-    { category = "FLASK",      spellId = 1235110,   enabled = true }, -- Blood Knights
-    { category = "FLASK",      spellId = 1235057,   enabled = true }, -- Thalassian Resistance
-    { category = "FLASK",      spellId = 1235111,   enabled = true }, -- Shattered Sun
+    { category = "FLASK",      spellId = 1235110,   enabled = true }, -- Flask of the Blood Knights (Haste)
+    { category = "FLASK",      spellId = 1235057,   enabled = true }, -- Flask of Thalassian Resistance (Vers)
+    { category = "FLASK",      spellId = 1235111,   enabled = true }, -- Flask of the Shattered Sun (Crit)
+    { category = "FLASK",      spellId = 1235108,   enabled = true }, -- Flask of the Magisters (Mastery)
     -- TWW Flasks
     { category = "FLASK",      spellId = 432021,    enabled = true }, -- Alchemical Chaos
     { category = "FLASK",      spellId = 431971,    enabled = true }, -- Flask of Tempered Aggression
     { category = "FLASK",      spellId = 431972,    enabled = true }, -- Flask of Tempered Swiftness
     { category = "FLASK",      spellId = 431974,    enabled = true }, -- Flask of Tempered Mastery
     { category = "FLASK",      spellId = 431973,    enabled = true }, -- Flask of Tempered Versatility
-
     -- Food
     { category = "FOOD",       spellId = 457284,    enabled = true }, -- Well Fed (Mainstat)
     { category = "FOOD",       spellId = 1232585,   enabled = true }, -- Well Fed (Stamina + Mainstat)
@@ -141,7 +141,6 @@ local CUSTOM_BUFFS = {
     { category = "FOOD",       spellId = 462181,    enabled = true }, -- Hearty Well Fed (Crit)
     { category = "FOOD",       spellId = 462183,    enabled = true }, -- Hearty Well Fed (Mastery)
     { category = "FOOD",       spellId = 462180,    enabled = true }, -- Hearty Well Fed (Haste)
-
     -- Weapon enchants
     { category = "MH_ENCHANT", weaponSlot = "main", text = "MH",   enabled = true },
     { category = "OH_ENCHANT", weaponSlot = "off",  text = "OH",   enabled = true },
