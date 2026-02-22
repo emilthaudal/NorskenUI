@@ -404,7 +404,6 @@ GUIFrame:RegisterContent("BuffBars", function(scrollChild, yOffset)
                     ApplySettings()
                 end
             end)
-        durationInput.editBox:SetNumeric(true)
         row3c:AddWidget(durationInput, 0.2)
         table_insert(allWidgets, durationInput)
 

@@ -388,7 +388,6 @@ GUIFrame:RegisterContent("BuffIcons", function(scrollChild, yOffset)
                     ApplySettings()
                 end
             end)
-        durationInput.editBox:SetNumeric(true)
         row3b:AddWidget(durationInput, 0.35)
         table_insert(allWidgets, durationInput)
 
