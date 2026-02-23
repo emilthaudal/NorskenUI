@@ -49,7 +49,7 @@ GUIFrame:RegisterContent("HomePage", function(scrollChild, yOffset)
     local row1 = GUIFrame:CreateRow(card2.content, 38)
 
     -- Edit Mode Button
-    local editModeBtn = GUIFrame:CreateButton(row1, "Toggle Edit Mode", {
+    local editModeBtn = GUIFrame:CreateButton(row1, "Toggle Anchors", {
         width = 140,
         height = 32,
         callback = function()
