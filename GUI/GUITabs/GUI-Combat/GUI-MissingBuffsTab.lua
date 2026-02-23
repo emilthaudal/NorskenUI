@@ -75,6 +75,18 @@ local function UpdateAllWidgetStates()
     end
 end
 
+-- Helper to apply new state
+local function ApplyMissingBuffsState(enabled)
+    local MBUFFS = GetModule()
+    if not MBUFFS then return end
+    MBUFFS.db.Enabled = enabled
+    if enabled then
+        NorskenUI:EnableModule("MissingBuffs")
+    else
+        NorskenUI:DisableModule("MissingBuffs")
+    end
+end
+
 -- Register cleanup callback once
 if not GUIFrame._missingBuffsCleanupRegistered then
     GUIFrame._missingBuffsCleanupRegistered = true
@@ -93,6 +105,7 @@ local CATEGORY_ICONS = {
     OHEnchant = 180608, -- Same
     Rune = 1264426,     -- Augment Rune
     RaidBuffs = 1126,   -- Mark of the Wild
+    Poisons = 2823,     -- Deadly Poison
 }
 
 -- Class icons
@@ -275,7 +288,7 @@ local function RenderRaidBuffsTab(scrollChild, yOffset, activeCards)
     local enableCheck = GUIFrame:CreateCheckbox(row1a, "Enable Missing Buffs", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
-            Refresh()
+            ApplyMissingBuffsState(checked)
             UpdateAllWidgetStates()
         end,
         true, "Missing Buffs", "On", "Off"
@@ -339,6 +352,9 @@ local function RenderRaidBuffsTab(scrollChild, yOffset, activeCards)
 
     -- Raid Buffs row
     CreateCategoryRow(card2, "RaidBuffs", "Raid Buffs", CATEGORY_ICONS.RaidBuffs, db.Consumables, false)
+
+    -- Poisons row (Rogue only)
+    CreateCategoryRow(card2, "Poisons", "Rogue Poisons", CATEGORY_ICONS.Poisons, db.Consumables, false)
 
     yOffset = yOffset + card2:GetContentHeight() + Theme.paddingSmall
 
@@ -534,7 +550,7 @@ local STANCE_OPTIONS = {
     -- PRIEST handled separately
 }
 
--- Helper to create a class stance card with spec-specific options
+-- Helper to create a class stance card with spec-specific options (per-spec toggles only)
 local function CreateClassStanceCard(scrollChild, yOffset, classKey, title, iconData, db, activeCards)
     db[classKey] = db[classKey] or {}
 
@@ -545,62 +561,42 @@ local function CreateClassStanceCard(scrollChild, yOffset, classKey, title, icon
     -- Track widgets that need enable/disable updates
     local specWidgets = {}
 
-    -- Header row with icon and enable checkbox
-    local headerRow = GUIFrame:CreateRow(card.content, 40)
-
-    -- Icon widget
-    local iconWidget = CreateIconWidget(headerRow, iconData, 40)
-    headerRow:AddWidget(iconWidget, 0.1)
-
-    -- Function to update all spec widget states based on class enable state
+    -- Function to update spec widget states based on spec toggle
     local function UpdateSpecWidgetStates()
-        local classEnabled = db[classKey].Enabled ~= false
         for specName, widgets in pairs(specWidgets) do
             local specEnabledKey = specName .. "Enabled"
             local specEnabled = db[classKey][specEnabledKey] == true
 
-            -- Toggle is disabled if class is disabled
-            if widgets.toggle and widgets.toggle.SetEnabled then
-                widgets.toggle:SetEnabled(classEnabled)
-            end
-
-            -- Dropdown is disabled if class is disabled OR spec toggle is off
+            -- Dropdown is disabled if spec toggle is off
             if widgets.dropdown and widgets.dropdown.SetEnabled then
-                widgets.dropdown:SetEnabled(classEnabled and specEnabled)
+                widgets.dropdown:SetEnabled(specEnabled)
             end
 
-            -- Reverse icon toggle is disabled if class is disabled OR spec toggle is off
+            -- Reverse icon toggle is disabled if spec toggle is off
             if widgets.reverseIcon and widgets.reverseIcon.SetEnabled then
-                widgets.reverseIcon:SetEnabled(classEnabled and specEnabled)
+                widgets.reverseIcon:SetEnabled(specEnabled)
             end
         end
     end
-
-    -- Enable checkbox - warns if ANY stance/form is missing
-    local enableCheck = GUIFrame:CreateCheckbox(headerRow, "Warn if no stance active", db[classKey].Enabled ~= false,
-        function(checked)
-            db[classKey].Enabled = checked
-            UpdateSpecWidgetStates()
-            Refresh()
-        end)
-    headerRow:AddWidget(enableCheck, 0.9)
-    table_insert(allWidgets, enableCheck)
-    card:AddRow(headerRow, 40)
 
     -- Get spec options for this class
     local specOptions = STANCE_OPTIONS[classKey]
     local specIcons = SPEC_ICONS[classKey]
 
-    -- Add spec-specific rows if available
+    -- Add spec-specific rows
     if specOptions then
-        -- Separator between main toggle and spec options
-        local sepRow = GUIFrame:CreateRow(card.content, 8)
-        local sep = GUIFrame:CreateSeparator(sepRow)
-        sepRow:AddWidget(sep, 1)
-        table_insert(allWidgets, sep)
-        card:AddRow(sepRow, 8)
-
+        local isFirst = true
         for specName, options in pairs(specOptions) do
+            -- Add separator between rows
+            if not isFirst then
+                local sepRow = GUIFrame:CreateRow(card.content, 8)
+                local sep = GUIFrame:CreateSeparator(sepRow)
+                sepRow:AddWidget(sep, 1)
+                table_insert(allWidgets, sep)
+                card:AddRow(sepRow, 8)
+            end
+            isFirst = false
+
             local specRow = GUIFrame:CreateRow(card.content, 40)
 
             -- Spec icon
@@ -608,9 +604,9 @@ local function CreateClassStanceCard(scrollChild, yOffset, classKey, title, icon
             local specIconWidget = CreateIconWidget(specRow, specIconId or 134400, 32)
             specRow:AddWidget(specIconWidget, 0.1)
 
-            -- Specific stance toggle
+            -- Spec enable toggle
             local specEnabledKey = specName .. "Enabled"
-            local specToggle = GUIFrame:CreateCheckbox(specRow, specName .. ": Require specific",
+            local specToggle = GUIFrame:CreateCheckbox(specRow, specName,
                 db[classKey][specEnabledKey] == true,
                 function(checked)
                     db[classKey][specEnabledKey] = checked
@@ -673,9 +669,9 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     local infoRow = GUIFrame:CreateRow(infoCard.content, infoTextHeight)
     local infoText = GUIFrame:CreateText(infoRow,
         NRSKNUI:ColorTextByTheme("How it works"),
-        (NRSKNUI:ColorTextByTheme("• ") .. "Main toggle: Warns if you have no stance/form active at all\n" ..
-            NRSKNUI:ColorTextByTheme("• ") .. "Per-spec toggles: When enabled, requires a specific stance for that spec\n" ..
-            NRSKNUI:ColorTextByTheme("• ") .. "Reverse Icon Toggle: When enabled, the current stance icon is shown instead of the required stance icon and the missing text is hidden."),
+        (NRSKNUI:ColorTextByTheme("• ") .. "Spec toggles: Enable/disable stance tracking for each spec\n" ..
+            NRSKNUI:ColorTextByTheme("• ") .. "Required dropdown: Choose which stance is required for that spec\n" ..
+            NRSKNUI:ColorTextByTheme("• ") .. "Reverse Icon: Show current stance icon instead of required stance, hides missing text"),
         infoTextHeight, "hide")
     infoRow:AddWidget(infoText, 1)
     table_insert(allWidgets, infoText)
@@ -706,7 +702,8 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     local balanceIcon = CreateIconWidget(balanceRow, SPEC_ICONS.DRUID.Balance, 40)
     balanceRow:AddWidget(balanceIcon, 0.1)
 
-    local balanceToggle = GUIFrame:CreateCheckbox(balanceRow, "Balance: Require Moonkin Form", db.Stances.DRUID.BalanceEnabled == true,
+    local balanceToggle = GUIFrame:CreateCheckbox(balanceRow, "Balance: Require Moonkin Form",
+        db.Stances.DRUID.BalanceEnabled == true,
         function(checked)
             db.Stances.DRUID.BalanceEnabled = checked
             Refresh()
@@ -727,7 +724,8 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     local feralIcon = CreateIconWidget(feralRow, SPEC_ICONS.DRUID.Feral, 40)
     feralRow:AddWidget(feralIcon, 0.1)
 
-    local feralToggle = GUIFrame:CreateCheckbox(feralRow, "Feral: Require Cat Form", db.Stances.DRUID.FeralEnabled == true,
+    local feralToggle = GUIFrame:CreateCheckbox(feralRow, "Feral: Require Cat Form",
+        db.Stances.DRUID.FeralEnabled == true,
         function(checked)
             db.Stances.DRUID.FeralEnabled = checked
             Refresh()
@@ -748,7 +746,8 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     local guardianIcon = CreateIconWidget(guardianRow, SPEC_ICONS.DRUID.Guardian, 40)
     guardianRow:AddWidget(guardianIcon, 0.1)
 
-    local guardianToggle = GUIFrame:CreateCheckbox(guardianRow, "Guardian: Require Bear Form", db.Stances.DRUID.GuardianEnabled == true,
+    local guardianToggle = GUIFrame:CreateCheckbox(guardianRow, "Guardian: Require Bear Form",
+        db.Stances.DRUID.GuardianEnabled == true,
         function(checked)
             db.Stances.DRUID.GuardianEnabled = checked
             Refresh()
@@ -769,7 +768,8 @@ local function RenderStancesTab(scrollChild, yOffset, activeCards)
     local evokerIcon = CreateIconWidget(evokerRow, SPEC_ICONS.EVOKER.Augmentation, 40)
     evokerRow:AddWidget(evokerIcon, 0.1)
 
-    local evokerToggle = GUIFrame:CreateCheckbox(evokerRow, "Require Attunement", db.Stances.EVOKER.AugmentationEnabled == true,
+    local evokerToggle = GUIFrame:CreateCheckbox(evokerRow, "Require Attunement",
+        db.Stances.EVOKER.AugmentationEnabled == true,
         function(checked)
             db.Stances.EVOKER.AugmentationEnabled = checked
             Refresh()

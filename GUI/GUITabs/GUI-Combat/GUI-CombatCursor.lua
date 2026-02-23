@@ -174,23 +174,25 @@ local function CreateTextureSelector(parent, textures, textureOrder, currentText
     return container
 end
 
+-- Helper to get CursorCircle module
+local function GetCursorCircleModule()
+    if NorskenUI then
+        return NorskenUI:GetModule("CursorCircle", true)
+    end
+    return nil
+end
+
 -- Register Cursor Circle Tab
 GUIFrame:RegisterContent("cursorCircle", function(scrollChild, yOffset)
     -- Get CursorCircle module
-    local CC = NorskenUI and NorskenUI:GetModule("CursorCircle", true)
-    if not CC then
-        local errorCard = GUIFrame:CreateCard(scrollChild, "Error", yOffset)
-        errorCard:AddLabel("CursorCircle module not loaded")
-        return yOffset + errorCard:GetContentHeight() + Theme.paddingMedium
-    end
-
-    -- Safety check for database
-    local db = CC.db
+    local db = NRSKNUI.db and NRSKNUI.db.profile.Miscellaneous.CursorCircle
     if not db then
         local errorCard = GUIFrame:CreateCard(scrollChild, "Error", yOffset)
         errorCard:AddLabel("Database not available")
         return yOffset + errorCard:GetContentHeight() + Theme.paddingMedium
     end
+
+    local CC = GetCursorCircleModule()
 
     -- Track all widgets for main toggle control
     local allWidgets = {}               -- All widgets
@@ -221,6 +223,17 @@ GUIFrame:RegisterContent("cursorCircle", function(scrollChild, yOffset)
 
     local function ApplyGCDSettings()
         ApplySettings()
+    end
+
+    -- Helper to apply new state
+    local function ApplyCursorCircleState(enabled)
+        if not CC then return end
+        CC.db.Enabled = enabled
+        if enabled then
+            NorskenUI:EnableModule("CursorCircle")
+        else
+            NorskenUI:DisableModule("CursorCircle")
+        end
     end
 
     -- Comprehensive widget state update (priority-based)
@@ -332,7 +345,7 @@ GUIFrame:RegisterContent("cursorCircle", function(scrollChild, yOffset)
     local row1 = GUIFrame:CreateRow(card1.content, 37)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Cursor Circle", db.Enabled == true, function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyCursorCircleState(checked)
             UpdateAllWidgetStates()
         end,
         true,

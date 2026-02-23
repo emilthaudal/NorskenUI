@@ -150,6 +150,18 @@ GUIFrame:RegisterContent("BuffIcons", function(scrollChild, yOffset)
         end)
     end
 
+    -- Helper to apply new state
+    local function ApplyBuffIconsState(enabled)
+        local BI = GetModule()
+        if not BI then return end
+        BI.db.Enabled = enabled
+        if enabled then
+            NorskenUI:EnableModule("BuffIcons")
+        else
+            NorskenUI:DisableModule("BuffIcons")
+        end
+    end
+
     -- Register cleanup callback to hide previews when GUI closes
     GUIFrame.contentCleanupCallbacks = GUIFrame.contentCleanupCallbacks or {}
     GUIFrame.contentCleanupCallbacks["BuffIcons"] = function()
@@ -212,7 +224,7 @@ GUIFrame:RegisterContent("BuffIcons", function(scrollChild, yOffset)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Buff Icons", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyBuffIconsState(checked)
             UpdateAllWidgetStates()
         end,
         true, "Buff Icons", "On", "Off"

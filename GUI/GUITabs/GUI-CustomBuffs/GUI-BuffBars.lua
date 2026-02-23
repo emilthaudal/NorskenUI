@@ -151,6 +151,18 @@ GUIFrame:RegisterContent("BuffBars", function(scrollChild, yOffset)
         end)
     end
 
+    -- Helper to apply new state
+    local function ApplyBuffBarsState(enabled)
+        local BB = GetModule()
+        if not BB then return end
+        BB.db.Enabled = enabled
+        if enabled then
+            NorskenUI:EnableModule("BuffBars")
+        else
+            NorskenUI:DisableModule("BuffBars")
+        end
+    end
+
     -- Register cleanup callback to hide previews when GUI closes
     GUIFrame.contentCleanupCallbacks = GUIFrame.contentCleanupCallbacks or {}
     GUIFrame.contentCleanupCallbacks["BuffBars"] = function()
@@ -215,7 +227,7 @@ GUIFrame:RegisterContent("BuffBars", function(scrollChild, yOffset)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Buff Bars", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyBuffBarsState(checked)
             UpdateAllWidgetStates()
         end,
         true, "Buff Bars", "On", "Off"

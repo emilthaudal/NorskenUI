@@ -330,7 +330,7 @@ end
 
 function CR:HidePreview()
     self.isPreview = false
-    if not self.db.Enabled then
+    if not self.db.Enabled and self.frame then
         self.frame:Hide()
     end
     self:Update()

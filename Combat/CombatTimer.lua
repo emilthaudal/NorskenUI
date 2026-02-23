@@ -235,7 +235,7 @@ end
 
 function CT:HidePreview()
     self.isPreview = false
-    if not self.running and not self.db.Enabled then
+    if self.frame and not self.running and not self.db.Enabled then
         self.frame:Hide()
     end
 end

@@ -10,6 +10,14 @@ local LSM = NRSKNUI.LSM or LibStub("LibSharedMedia-3.0", true)
 -- Localization Setup
 local table_insert = table.insert
 
+-- Helper to get Combat Timer module
+local function GetCombatTimerModule()
+    if NorskenUI then
+        return NorskenUI:GetModule("CombatTimer", true)
+    end
+    return nil
+end
+
 -- Combat Timer Tab Content
 GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
     -- Load database settings
@@ -20,29 +28,36 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
         return yOffset + errorCard:GetContentHeight() + Theme.paddingMedium
     end
 
+    local CT = GetCombatTimerModule()
+
     -- Track widgets for enable/disable logic
     local allWidgets = {}    -- All widgets (except main toggle)
     local shadowWidgets = {} -- Widgets dependent on shadow enable
     local bgWidgets = {}     -- Backdrop Widgets
 
-    -- Helper to get Combat Timer module
-    local function GetCombatTimerModule()
-        if NorskenUI then
-            return NorskenUI:GetModule("CombatTimer", true)
-        end
-        return nil
-    end
-
     -- Helper to apply settings changes
     local function ApplySettings()
-        local CT = GetCombatTimerModule()
-        if CT and CT.ApplySettings then CT:ApplySettings() end
+        if CT then
+            CT:ApplySettings()
+        end
     end
 
     -- Helper to apply position changes
     local function ApplyPosition()
-        local CT = GetCombatTimerModule()
-        if CT and CT.ApplyPosition then CT:ApplyPosition() end
+        if CT then
+            CT:ApplyPosition()
+        end
+    end
+
+    -- Helper to apply new state
+    local function ApplyCombatTimerState(enabled)
+        if not CT then return end
+        CT.db.Enabled = enabled
+        if enabled then
+            NorskenUI:EnableModule("CombatTimer")
+        else
+            NorskenUI:DisableModule("CombatTimer")
+        end
     end
 
     -- Widget state update
@@ -84,7 +99,7 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
     local row1 = GUIFrame:CreateRow(card1.content, 36)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Combat Timer", db.Enabled ~= false, function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyCombatTimerState(checked)
             UpdateAllWidgetStates()
         end,
         true,
@@ -162,10 +177,10 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
 
     -- Font Outline Dropdown
     local outlineList = {
-        { key = "NONE", text = "None" },
-        { key = "OUTLINE", text = "Outline" },
+        { key = "NONE",         text = "None" },
+        { key = "OUTLINE",      text = "Outline" },
         { key = "THICKOUTLINE", text = "Thick" },
-        { key = "SOFTOUTLINE", text = "Soft" },
+        { key = "SOFTOUTLINE",  text = "Soft" },
     }
     local outlineDropdown = GUIFrame:CreateDropdown(row3a, "Outline", outlineList, db.FontOutline or "OUTLINE", 45,
         function(key)

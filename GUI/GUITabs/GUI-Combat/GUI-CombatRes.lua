@@ -65,6 +65,18 @@ local function ApplySettings()
     if CR and CR.ApplySettings then CR:ApplySettings() end
 end
 
+-- Helper to apply new state
+local function ApplyCombatResState(enabled)
+    local CR = GetCombatResModule()
+    if not CR then return end
+    CR.db.Enabled = enabled
+    if enabled then
+        NorskenUI:EnableModule("CombatRes")
+    else
+        NorskenUI:DisableModule("CombatRes")
+    end
+end
+
 -- Comprehensive widget state update
 local function UpdateAllWidgetStates()
     local db = GetBattleResDB()
@@ -139,7 +151,7 @@ local function RenderGeneralTab(scrollChild, yOffset, activeCards)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Combat Res Tracker", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyCombatResState(checked)
             UpdateAllWidgetStates()
         end,
         true,

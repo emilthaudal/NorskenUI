@@ -224,14 +224,14 @@ function PreviewManager:StartAllPreviews()
 
     for _, moduleName in ipairs(PREVIEW_MODULES) do
         local module = Addon:GetModule(moduleName, true)
-        if module and module.ShowPreview then
+        if module and module.ShowPreview and module.db.Enabled then
             module:ShowPreview()
         end
     end
 
     -- CursorCircle uses ApplySettings instead of ShowPreview
     local CursorCircle = Addon:GetModule("CursorCircle", true)
-    if CursorCircle and CursorCircle.ApplySettings then
+    if CursorCircle and CursorCircle.ApplySettings and CursorCircle.db.Enabled then
         CursorCircle:ApplySettings()
     end
 end

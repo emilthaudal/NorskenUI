@@ -8,9 +8,12 @@ local Theme = NRSKNUI.Theme
 local ipairs = ipairs
 local table_insert = table.insert
 
--- Get module reference
-local function GetModule()
-    return NorskenUI:GetModule("CombatCross", true)
+-- Helper to get CombatCross module
+local function GetCombatCrossModule()
+    if NorskenUI then
+        return NorskenUI:GetModule("CombatCross", true)
+    end
+    return nil
 end
 
 -- Register Combat Cross tab content
@@ -22,13 +25,25 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
         return yOffset + errorCard:GetContentHeight() + Theme.paddingMedium
     end
 
+    local CC = GetCombatCrossModule()
+
     local allWidgets = {}
     local colorModeWidgets = {}
 
     local function ApplySettings()
-        local mod = GetModule()
-        if mod and mod.ApplySettings then
-            mod:ApplySettings()
+        if CC then
+            CC:ApplySettings()
+        end
+    end
+
+    -- Helper to apply new state
+    local function ApplyCombatCrossState(enabled)
+        if not CC then return end
+        CC.db.Enabled = enabled
+        if enabled then
+            NorskenUI:EnableModule("CombatCross")
+        else
+            NorskenUI:DisableModule("CombatCross")
         end
     end
 
@@ -60,7 +75,7 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Combat Cross", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
-            ApplySettings()
+            ApplyCombatCrossState(checked)
             UpdateAllWidgetStates()
         end,
         true, "Combat Cross", "On", "Off"
