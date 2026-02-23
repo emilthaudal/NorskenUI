@@ -69,7 +69,8 @@ local CLASS_BUFFS = {
         }, -- Blessing of the Bronze
     },
     ["MAGE"] = {
-        { spellId = 1459, text = GENERALBUFF_TEXT }, -- Arcane Intellect
+        { spellId = 1459, text = GENERALBUFF_TEXT },                                                            -- Arcane Intellect
+        { spellId = 210126, spellbookId = 205022, text = GENERALBUFF_TEXT, specIds = { 62 }, onlySelf = true }, -- Arcane Familiar
     },
     ["PRIEST"] = {
         { spellId = 21562, text = GENERALBUFF_TEXT }, -- Power Word: Fortitude
@@ -82,43 +83,32 @@ local CLASS_BUFFS = {
     },
 }
 
--- Class stance/form definitions
-local CLASS_STANCES = {
-    WARRIOR = {
-        stances = {
-            { spellId = 386164 }, -- Battle Stance
-            { spellId = 386196 }, -- Berserker Stance
-            { spellId = 386208 }, -- Defensive Stance
-        },
-    },
-    PALADIN = {
-        stances = {
-            { spellId = 465 },    -- Devotion Aura
-            { spellId = 317920 }, -- Concentration Aura
-            { spellId = 32223 },  -- Crusader Aura
-        },
-    },
-    EVOKER = {
-        stances = {
-            { spellId = 403264 }, -- Black Attunement
-            { spellId = 403265 }, -- Bronze Attunement
-        },
-        specIds = { 1473 },       -- Augmentation only
-    },
-    DRUID = {
-        stances = {
-            { spellId = 24858, specIds = { 102 } }, -- Moonkin Form (Balance)
-            { spellId = 768,   specIds = { 103 } }, -- Cat Form (Feral)
-            { spellId = 5487,  specIds = { 104 } }, -- Bear Form (Guardian)
-        },
-    },
-    PRIEST = {
-        stances = {
-            { spellId = 232698, extraSpellIds = { 194249 } }, -- Shadowform / Voidform
-        },
-        specIds = { 258 },                                    -- Shadow only
-    },
+-- Rogue poison spell IDs
+local ROGUE_POISONS = {
+    -- Non-lethal poisons
+    { spellId = 381637, poisonType = "nonlethal" }, -- Atrophic Poison
+    { spellId = 5761,   poisonType = "nonlethal" }, -- Numbing Poison
+    { spellId = 3408,   poisonType = "nonlethal" }, -- Crippling Poison
+    -- Lethal poisons
+    { spellId = 381664, poisonType = "lethal" }, -- Amplifying Poison
+    { spellId = 2823,   poisonType = "lethal" }, -- Deadly Poison
+    { spellId = 315584, poisonType = "lethal" }, -- Instant Poison
+    { spellId = 8679,   poisonType = "lethal" }, -- Wound Poison
 }
+
+-- Rogue poison spell IDs for easy reference
+local POISON_IDS = {
+    ATROPHIC = 381637,
+    NUMBING = 5761,
+    CRIPPLING = 3408,
+    AMPLIFYING = 381664,
+    DEADLY = 2823,
+    INSTANT = 315584,
+    WOUND = 8679,
+}
+
+-- Assassination talent that allows 2 lethal + 2 non-lethal
+local ASSA_DOUBLE_POISON_TALENT = 381801
 
 -- Custom buff table
 local CUSTOM_BUFFS = {
@@ -550,6 +540,94 @@ local function CheckCustomBuffs()
     return missing
 end
 
+-- Check rogue poisons
+local function CheckRoguePoisons()
+    if playerClass ~= "ROGUE" then return {} end
+
+    local db = MBUFFS.db
+    if not db then return {} end
+
+    -- Check if poison tracking is enabled
+    local consumablesDb = db.Consumables or {}
+    local poisonSettings = consumablesDb.Poisons or {}
+    if poisonSettings.Enabled == false then return {} end
+
+    -- Check load condition
+    if not IsLoadConditionMet(poisonSettings.LoadCondition) then return {} end
+
+    local missing = {}
+    local spec = GetSpecialization()
+    if not spec then return missing end
+    local specId = GetSpecializationInfo(spec)
+
+    -- Special handling for Assa rogue with their Tempered Blades talents
+    local isAssassination = specId == 259
+    local hasDoublePoisonTalent = isAssassination and IsSpellKnown(ASSA_DOUBLE_POISON_TALENT)
+
+    -- Determine required counts
+    local requiredLethal = hasDoublePoisonTalent and 2 or 1
+    local requiredNonLethal = hasDoublePoisonTalent and 2 or 1
+
+    -- Count current poisons
+    local lethalCount = 0
+    local nonLethalCount = 0
+
+    for _, poison in ipairs(ROGUE_POISONS) do
+        if PlayerHasBuff(poison.spellId) then
+            if poison.poisonType == "lethal" then
+                lethalCount = lethalCount + 1
+            else
+                nonLethalCount = nonLethalCount + 1
+            end
+        end
+    end
+
+    -- Calculate missing counts
+    local lethalMissing = requiredLethal - lethalCount
+    local nonLethalMissing = requiredNonLethal - nonLethalCount
+
+    if lethalMissing > 0 then
+        local lethalIcons = {}
+        if isAssassination then
+            lethalIcons[1] = POISON_IDS.DEADLY
+            if hasDoublePoisonTalent then
+                lethalIcons[2] = IsSpellKnown(POISON_IDS.AMPLIFYING) and POISON_IDS.AMPLIFYING or POISON_IDS.INSTANT
+            end
+        else
+            lethalIcons[1] = POISON_IDS.INSTANT
+        end
+
+        for i = 1, lethalMissing do
+            local iconSpellId = lethalIcons[i] or lethalIcons[1]
+            missing[#missing + 1] = {
+                buff = { spellId = iconSpellId, text = "" },
+                text = "",
+                isCustom = true,
+            }
+        end
+    end
+
+    -- Add missing non-lethal poison entries with spec-specific icons
+    if nonLethalMissing > 0 then
+        local nonLethalIcons = {}
+        nonLethalIcons[1] = POISON_IDS.ATROPHIC
+        if hasDoublePoisonTalent then
+            nonLethalIcons[2] = POISON_IDS.CRIPPLING
+        end
+
+        for i = 1, nonLethalMissing do
+            local iconSpellId = nonLethalIcons[i] or nonLethalIcons[1]
+            missing[#missing + 1] = {
+                buff = { spellId = iconSpellId, text = "" },
+                text = "",
+                isCustom = true,
+            }
+        end
+    end
+
+    return missing
+end
+
 -- General buff icon creation
 local function CreateIcon()
     local raidDb = MBUFFS.db.RaidBuffDisplay
@@ -597,7 +675,7 @@ local function CreateContainerFrame()
     containerFrame:Hide()
 end
 
--- Warrior stance spell IDs for timer tracking
+-- Warrior stance spell IDs
 local WARRIOR_STANCE_SPELLS = {
     [386164] = true, -- Battle Stance
     [386196] = true, -- Berserker Stance
@@ -833,7 +911,6 @@ end
 
 -- Check stances/forms
 local function CheckStances()
-    -- For warriors, don't interfere while stance timer is active and hide when timer is over
     if playerClass == "WARRIOR" and stanceTimerActive then
         UpdateStanceTextDisplay()
         return
@@ -861,10 +938,10 @@ local function CheckStances()
     local classSettings = stancesDb[playerClass]
     if not classSettings then return end
 
-    -- Special handling for Priest (Shadow only, simple toggle)
+    -- Special handling for Priest
     if playerClass == "PRIEST" then
         if not classSettings.ShadowEnabled then return end
-        if currentSpecId ~= 258 then return end -- Shadow spec only
+        if currentSpecId ~= 258 then return end
 
         -- When you enter voidform cd, standard tracking is overriden and we cant check this in combat
         -- This is fine since almost always, you would want to be in shadowform pre combat so we just return early here
@@ -883,9 +960,8 @@ local function CheckStances()
 
     -- Special handling for Druid
     if playerClass == "DRUID" then
-        -- Map spec IDs to their toggle key and required form
         local druidSpecs = {
-            [102] = { toggleKey = "BalanceEnabled", spellId = 24858 }, 
+            [102] = { toggleKey = "BalanceEnabled", spellId = 24858 },
             [103] = { toggleKey = "FeralEnabled", spellId = 768 },
             [104] = { toggleKey = "GuardianEnabled", spellId = 5487 },
         }
@@ -926,20 +1002,36 @@ local function CheckStances()
         return
     end
 
-    -- Warrior and Paladin use the full class toggle + per-spec toggle + dropdown pattern
-    -- Check if class toggle is enabled
-    local classEnabled = classSettings.Enabled ~= false
+    -- Warrior and Paladin use per-spec toggles only
+    if not specName then return end
 
-    -- Check if spec-specific requirement is enabled
-    local specEnabledKey = specName and (specName .. "Enabled")
-    local specEnabled = specEnabledKey and classSettings[specEnabledKey] and true or false
-    local requiredStanceId = specName and classSettings[specName] and tonumber(classSettings[specName])
-    local reverseIconKey = specName and (specName .. "ReverseIcon")
-    local reverseIcon = reverseIconKey and classSettings[reverseIconKey] and true or false
+    -- Default required stances per spec
+    local DEFAULT_STANCES = {
+        WARRIOR = {
+            Arms = 386164,       -- Battle Stance
+            Fury = 386196,       -- Berserker Stance
+            Protection = 386208, -- Defensive Stance
+        },
+        PALADIN = {
+            Holy = 465,          -- Devotion Aura
+            Protection = 465,    -- Devotion Aura
+            Retribution = 32223, -- Crusader Aura
+        },
+    }
 
-    -- If main class toggle is disabled, skip tracking
-    if not classEnabled then return end
-    if not specEnabled then return end
+    -- Check if spec toggle is enabled
+    local specEnabledKey = specName .. "Enabled"
+    if not classSettings[specEnabledKey] then return end
+
+    -- Get required stance
+    local classDefaults = DEFAULT_STANCES[playerClass]
+    local defaultStance = classDefaults and classDefaults[specName]
+    local requiredStanceId = tonumber(classSettings[specName]) or defaultStance
+    if not requiredStanceId then return end
+
+    -- Get reverse icon setting
+    local reverseIconKey = specName .. "ReverseIcon"
+    local reverseIcon = classSettings[reverseIconKey] and true or false
 
     -- Get current form/stance
     local currentForm = GetShapeshiftForm()
@@ -960,62 +1052,39 @@ local function CheckStances()
         end
     end
 
-    -- Determine what to warn about
-    if specEnabled and requiredStanceId then
-        if currentSpellId ~= requiredStanceId then
-            if IsSpellKnown(requiredStanceId) then
-                ShowStanceIcon(requiredStanceId, reverseIcon, currentSpellId)
-            end
-        end
-    elseif classEnabled then
-        if not currentSpellId then
-            local stanceData = CLASS_STANCES[playerClass]
-            if stanceData and stanceData.stances then
-                -- Check if the current spec has any applicable stances
-                local hasApplicableStance = false
-                for _, stance in ipairs(stanceData.stances) do
-                    -- If stance has specIds, check if current spec matches
-                    if stance.specIds then
-                        for _, specId in ipairs(stance.specIds) do
-                            if specId == currentSpecId then
-                                hasApplicableStance = true
-                                break
-                            end
-                        end
-                    else
-                        -- No specIds means applicable to all specs
-                        hasApplicableStance = true
-                    end
-                    if hasApplicableStance then break end
-                end
-
-                -- Only warn if this spec has applicable stances
-                if hasApplicableStance then
-                    for _, stance in ipairs(stanceData.stances) do
-                        if IsSpellKnown(stance.spellId) then
-                            ShowStanceIcon(stance.spellId)
-                            break
-                        end
-                    end
-                end
-            end
+    -- Check if missing required stance
+    if currentSpellId ~= requiredStanceId then
+        if IsSpellKnown(requiredStanceId) then
+            ShowStanceIcon(requiredStanceId, reverseIcon, currentSpellId)
         end
     end
 end
 
--- Show stance timer, only doing this for warrior since they have a 3 second CD when swapping stances
-local function ShowStanceTimer()
+-- Show stance timer for warrior
+local function ShowStanceTimer(spellId)
     if not stanceFrame then CreateStanceFrame() end
     if not stanceFrame then return end
     if not stanceFrame.cooldown then return end
 
-    -- Mark timer as active so CheckStances won't interfere
+    -- Mark timer as active
     stanceTimerActive = true
+
+    -- Show the icon for the stance we switched to
+    local texture = GetSpellTexture(spellId)
+    if texture then
+        stanceFrame.icon:SetTexture(texture)
+    end
+    stanceFrame.text:SetText("")
 
     -- Start cooldown animation
     stanceFrame.cooldown:SetAllPoints(stanceFrame)
     stanceFrame.cooldown:SetCooldown(GetTime(), STANCE_TIMER_DURATION)
     stanceFrame:Show()
+
+    -- Cancel existing timer if any
+    if stanceTimerHandle then
+        stanceTimerHandle:Cancel()
+    end
 
     -- After duration, clear flag and re-check stances
     stanceTimerHandle = C_Timer.NewTimer(STANCE_TIMER_DURATION, function()
@@ -1187,6 +1256,11 @@ local function CheckForMissingBuffs()
     for _, entry in ipairs(customMissing) do
         currentMissingBuffs[#currentMissingBuffs + 1] = entry
     end
+    -- Check rogue poisons
+    local poisonMissing = CheckRoguePoisons()
+    for _, entry in ipairs(poisonMissing) do
+        currentMissingBuffs[#currentMissingBuffs + 1] = entry
+    end
     -- Check class buffs like raid buffs like Intellect, Fortitude, etc
     local consumablesDb = MBUFFS.db.Consumables or {}
     local raidBuffsSettings = consumablesDb.RaidBuffs or {}
@@ -1215,7 +1289,12 @@ local function CheckForMissingBuffs()
                             end
                         end
                     end
-                    if specOk then
+                    -- Check if talent/spell requirement is met
+                    local talentOk = true
+                    if buff.requiresSpellKnown then
+                        talentOk = IsSpellKnown(buff.requiresSpellKnown)
+                    end
+                    if specOk and talentOk then
                         local isMissing, needsReapply = CheckBuffStatus(buff)
                         if isMissing then
                             currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = GENERALBUFF_TEXT }
@@ -1332,7 +1411,7 @@ function MBUFFS:OnEnable()
         UpdateStanceTextDisplay()
     end)
 
-    -- For Warrior stance icon, show a 3 second cooldown when any stance spell is casted
+    -- For Warrior stance changes
     self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", function(_, unit, _, spellID)
         if unit ~= "player" then return end
         if playerClass ~= "WARRIOR" then return end
@@ -1343,7 +1422,43 @@ function MBUFFS:OnEnable()
         local stanceDb = self.db and self.db.StanceDisplay
         if not stanceDb or not stanceDb.Enabled then return end
 
-        ShowStanceTimer()
+        -- Get current spec and required stance
+        local stancesDb = self.db and self.db.Stances
+        local classSettings = stancesDb and stancesDb.WARRIOR
+        if not classSettings then return end
+
+        local spec = GetSpecialization()
+        if not spec then return end
+        local specId = GetSpecializationInfo(spec)
+        local specName = SPEC_ID_TO_NAME[specId]
+        if not specName then return end
+
+        -- Check if this spec has tracking enabled
+        local specEnabledKey = specName .. "Enabled"
+        if not classSettings[specEnabledKey] then return end
+
+        -- Get required stance for this spec
+        local DEFAULT_STANCES = {
+            Arms = 386164,
+            Fury = 386196,
+            Protection = 386208,
+        }
+        local requiredStanceId = tonumber(classSettings[specName]) or DEFAULT_STANCES[specName]
+
+        -- If switching to required stance, instantly hide and cancel timer
+        if spellID == requiredStanceId then
+            if stanceTimerHandle then
+                stanceTimerHandle:Cancel()
+                stanceTimerHandle = nil
+            end
+            stanceTimerActive = false
+            if stanceFrame then
+                stanceFrame:Hide()
+            end
+        else
+            -- Switching to wrong stance, show 3s timer
+            ShowStanceTimer(spellID)
+        end
     end)
 
     -- M+ events
@@ -1456,6 +1571,7 @@ function MBUFFS:OnDisable()
         stanceTimerHandle:Cancel()
         stanceTimerHandle = nil
     end
+    stanceTimerActive = false
 
     -- Unregister from edit mode
     if NRSKNUI.EditMode then
@@ -1480,6 +1596,7 @@ end
 -- Public settings applier, called from GUI when the user makes changes
 function MBUFFS:ApplySettings()
     if not self.db then return end
+    if not self.db.Enabled then return end
 
     -- If preview is showing, refresh preview with new settings
     if IsTrackingPaused() then

@@ -1461,6 +1461,7 @@ local Defaults = {
                 OHEnchant = { Enabled = true, LoadCondition = "ANYGROUP" },
                 Rune = { Enabled = true, LoadCondition = "RAID" },
                 RaidBuffs = { Enabled = true, LoadCondition = "ANYGROUP" },
+                Poisons = { Enabled = true, LoadCondition = "ALWAYS" },
             },
             -- Raid Buff Display Settings (separate position from main)
             RaidBuffDisplay = {
