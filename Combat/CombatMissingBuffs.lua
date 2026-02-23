@@ -17,6 +17,7 @@ local ipairs, pairs = ipairs, pairs
 local wipe = wipe
 local UnitClass, UnitExists, UnitIsDeadOrGhost = UnitClass, UnitExists, UnitIsDeadOrGhost
 local UnitIsConnected, UnitCanAssist, UnitIsPlayer = UnitIsConnected, UnitCanAssist, UnitIsPlayer
+local UnitPosition = UnitPosition
 local InCombatLockdown = InCombatLockdown
 local GetNumGroupMembers = GetNumGroupMembers
 local IsInRaid = IsInRaid
@@ -217,7 +218,7 @@ local function IsLoadConditionMet(loadCondition)
     return true -- Default to true for unknown conditions
 end
 
--- Helper Functions to get spell and unit info
+-- Small helper to get spell info and texture
 local function IsSpellKnown(spellId)
     return spellId and C_SpellBook.IsSpellKnown(spellId)
 end
@@ -227,12 +228,22 @@ local function GetSpellTexture(spellId)
     end
     return nil
 end
+
+-- Checker for valid units to track,
+-- basically filter out units that cannot be affected and/or affect buff status
 local function IsValidTarget(unit)
-    return UnitExists(unit)
-        and not UnitIsDeadOrGhost(unit)
-        and UnitIsConnected(unit)
-        and UnitIsPlayer(unit)
-        and UnitCanAssist("player", unit)
+    if not UnitExists(unit) then return false end
+    if UnitIsDeadOrGhost(unit) then return false end
+    if not UnitIsConnected(unit) then return false end
+    if not UnitIsPlayer(unit) then return false end
+    if not UnitCanAssist("player", unit) then return false end
+    -- Filter out units not in the same instance as the player
+    local _, _, _, playerInstanceId = UnitPosition("player")
+    local _, _, _, unitInstanceId = UnitPosition(unit)
+    if playerInstanceId and unitInstanceId and playerInstanceId ~= unitInstanceId then
+        return false
+    end
+    return true
 end
 
 -- Helper to Check player buff status
@@ -299,9 +310,11 @@ local function UnitHasBuff(unit, spellId, extraSpellIds)
 end
 
 -- Helper to get buff-providing classes present in the group
+-- also checks if the unit is in the same instance, if not, dont show icon
 local function GetGroupBuffClasses()
     local classesInGroup = {}
     local groupSize = GetNumGroupMembers()
+    local _, _, _, playerInstanceId = UnitPosition("player")
 
     -- Solo, only check player's own class
     if groupSize == 0 then
@@ -315,9 +328,12 @@ local function GetGroupBuffClasses()
         for i = 1, groupSize do
             local unit = UNIT_STRINGS.raid[i]
             if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
-                local _, class = UnitClass(unit)
-                if class and CLASS_BUFFS[class] then
-                    classesInGroup[class] = true
+                local _, _, _, unitInstanceId = UnitPosition(unit)
+                if not playerInstanceId or not unitInstanceId or playerInstanceId == unitInstanceId then
+                    local _, class = UnitClass(unit)
+                    if class and CLASS_BUFFS[class] then
+                        classesInGroup[class] = true
+                    end
                 end
             end
         end
@@ -330,9 +346,12 @@ local function GetGroupBuffClasses()
         for i = 1, groupSize - 1 do
             local unit = UNIT_STRINGS.party[i]
             if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
-                local _, class = UnitClass(unit)
-                if class and CLASS_BUFFS[class] then
-                    classesInGroup[class] = true
+                local _, _, _, unitInstanceId = UnitPosition(unit)
+                if not playerInstanceId or not unitInstanceId or playerInstanceId == unitInstanceId then
+                    local _, class = UnitClass(unit)
+                    if class and CLASS_BUFFS[class] then
+                        classesInGroup[class] = true
+                    end
                 end
             end
         end
