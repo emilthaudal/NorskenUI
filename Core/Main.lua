@@ -85,7 +85,7 @@ function NRSKNUI:SetupMinimapIcon()
         OnTooltipShow = function(tt)
             tt:AddLine(NRSKNUI:ColorTextByTheme("Norsken") .. "|cffffffffUI|r")
             tt:AddLine("Left-Click to open options", 1, 1, 1)
-            tt:AddLine("Right-Click to open custom Edit Mode", 1, 1, 1)
+            tt:AddLine("Right-Click to toggle anchors", 1, 1, 1)
         end,
     })
 
@@ -120,10 +120,6 @@ end
 function NorskenUI:OnEnable()
     if NRSKNUI.RefreshTheme then NRSKNUI:RefreshTheme() end
     if NRSKNUI.Init then NRSKNUI:Init() end
-
-    -- Old modules
-    -- TODO: Update to aceaddon
-    if NRSKNUI.InitializeMiscellaneous then NRSKNUI:InitializeMiscellaneous() end
 
     -- Automatically enable modules based on their saved settings
     for name, module in self:IterateModules() do
