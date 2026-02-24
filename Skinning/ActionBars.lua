@@ -780,7 +780,7 @@ function ACB:UpdateBonusBarOverride()
 end
 
 -- Generic visibility handler for Pet and Stance bars
-local function SetupSpecialBarVisibility(container, blizzFrame, events, visibilityCheckFn)
+local function SetupSpecialBarVisibility(container, blizzFrame, events, visibilityCheckFn, barKey)
     if not container then return end
 
     -- Move the blizzard frame offscreen, this way we can still use it for updates and checks
@@ -799,7 +799,12 @@ local function SetupSpecialBarVisibility(container, blizzFrame, events, visibili
         end
 
         pendingUpdate = false
-        if visibilityCheckFn() then
+
+        -- Check if bar is enabled in settings
+        local barDB = ACB.db and ACB.db.Bars and ACB.db.Bars[barKey]
+        local isEnabled = barDB and barDB.Enabled ~= false
+
+        if isEnabled and visibilityCheckFn() then
             container:Show()
         else
             container:Hide()
@@ -836,7 +841,8 @@ local function SetupPetBarVisibility(container)
         container,
         PetActionBar,
         { "PET_BAR_UPDATE", "UNIT_PET", "PLAYER_CONTROL_GAINED", "PLAYER_CONTROL_LOST", "PLAYER_FARSIGHT_FOCUS_CHANGED" },
-        PetHasActionBar
+        PetHasActionBar,
+        "PetBar"
     )
 end
 
@@ -846,7 +852,8 @@ local function SetupStanceBarVisibility(container)
         container,
         StanceBar,
         { "UPDATE_SHAPESHIFT_FORMS", "UPDATE_SHAPESHIFT_FORM", "PLAYER_ENTERING_WORLD" },
-        function() return GetNumShapeshiftForms() > 0 end
+        function() return GetNumShapeshiftForms() > 0 end,
+        "StanceBar"
     )
 end
 
