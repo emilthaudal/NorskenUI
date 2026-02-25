@@ -28,6 +28,9 @@ local GetNumGroupMembers = GetNumGroupMembers
 local IsInGroup = IsInGroup
 local UnitIsSpellTarget = UnitIsSpellTarget
 local GetPlayerInfoByGUID = GetPlayerInfoByGUID
+local GetRaidTargetIndex = GetRaidTargetIndex
+local SetRaidTargetIconTexture = SetRaidTargetIconTexture
+local random = math.random
 local ipairs = ipairs
 local type = type
 
@@ -185,7 +188,15 @@ function FCB:CreateFrame()
         targetNames[i] = targetText
     end
 
+    -- Raid target marker
+    local targetMarker = frame:CreateTexture(nil, "OVERLAY")
+    targetMarker:SetTexture("Interface/TargetingFrame/UI-RaidTargetingIcons")
+    targetMarker:SetSize(40, 40)
+    targetMarker:SetParent(castBar)
+    targetMarker:Hide()
+
     -- Store references
+    self.targetMarker = targetMarker
     self.positioner = positioner
     self.frame, self.iconFrame, self.icon = frame, iconFrame, icon
     self.castBar, self.spark = castBar, spark
@@ -243,6 +254,15 @@ function FCB:ApplySettings()
             targetText:SetJustifyH(anchorPoint)
             NRSKNUI:ApplyFont(targetText, db.FontFace, targetSettings.FontSize, db.FontOutline)
         end
+    end
+
+    -- Target marker settings
+    if self.targetMarker then
+        local markerSettings = db.TargetMarker or {}
+        local anchorPoint = NRSKNUI:GetTextPointFromAnchor(markerSettings.Anchor)
+        self.targetMarker:SetSize(markerSettings.Size, markerSettings.Size)
+        self.targetMarker:ClearAllPoints()
+        self.targetMarker:SetPoint(anchorPoint, self.frame, anchorPoint, markerSettings.XOffset, markerSettings.YOffset)
     end
 
     self:ApplyPosition()
@@ -393,6 +413,36 @@ function FCB:HideTargetNames()
     if not self.targetNames then return end
     for i = 1, MAX_TARGET_NAMES do
         self.targetNames[i]:SetAlpha(0)
+    end
+end
+
+-- Toggle raid target marker event registration
+function FCB:ToggleTargetMarkerIntegration()
+    if self.db.TargetMarker and self.db.TargetMarker.Enabled then
+        self:RegisterEvent("RAID_TARGET_UPDATE", "UpdateTargetMarker")
+    else
+        self:UnregisterEvent("RAID_TARGET_UPDATE")
+        if self.targetMarker then
+            self.targetMarker:Hide()
+        end
+    end
+end
+
+-- Update raid target marker display
+function FCB:UpdateTargetMarker()
+    if not self.targetMarker then return end
+
+    if not self.db.TargetMarker or not self.db.TargetMarker.Enabled then
+        self.targetMarker:Hide()
+        return
+    end
+
+    local index = GetRaidTargetIndex("focus")
+    if index == nil then
+        self.targetMarker:Hide()
+    else
+        SetRaidTargetIconTexture(self.targetMarker, index)
+        self.targetMarker:Show()
     end
 end
 
@@ -623,12 +673,16 @@ end
 function FCB:PLAYER_FOCUS_CHANGED()
     if UnitExists("focus") then
         self:StartCast()
+        self:UpdateTargetMarker()
     else
         self:HideTargetNames()
         self:ResetCastState()
         if self.holdTimer then
             self.holdTimer:Cancel()
             self.holdTimer = nil
+        end
+        if self.targetMarker then
+            self.targetMarker:Hide()
         end
         if self.frame then self.frame:Hide() end
     end
@@ -740,6 +794,18 @@ function FCB:ShowPreview()
         end
     end
 
+    -- Show random target marker in preview
+    if self.targetMarker then
+        local markerSettings = self.db.TargetMarker
+        if markerSettings and markerSettings.Enabled then
+            local index = random(1, 8)
+            SetRaidTargetIconTexture(self.targetMarker, index)
+            self.targetMarker:Show()
+        else
+            self.targetMarker:Hide()
+        end
+    end
+
     -- Loop preview using ticker
     if self.previewTicker then self.previewTicker:Cancel() end
     self.previewTicker = C_Timer.NewTicker(PREVIEW_DURATION, function()
@@ -756,6 +822,9 @@ function FCB:HidePreview()
         self.previewTicker = nil
     end
     self:HideTargetNames()
+    if self.targetMarker then
+        self.targetMarker:Hide()
+    end
     if self.frame and not (self.casting or self.channeling or self.empowering) then
         self.frame:Hide()
     end
@@ -785,6 +854,7 @@ function FCB:OnEnable()
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA", "CacheInterruptId")
     self:EnsureOnUpdate()
     self:CacheInterruptId()
+    self:ToggleTargetMarkerIntegration()
 
     -- EditMode registration
     NRSKNUI.EditMode:RegisterElement({

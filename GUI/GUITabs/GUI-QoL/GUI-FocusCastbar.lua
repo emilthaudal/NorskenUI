@@ -275,6 +275,56 @@ GUIFrame:RegisterContent("FocusCastbar", function(scrollChild, yOffset)
     yOffset = yOffset + card4b:GetContentHeight() + Theme.paddingSmall
 
     ----------------------------------------------------------------
+    -- Card 4c: Target Marker Settings
+    ----------------------------------------------------------------
+    local card4c = GUIFrame:CreateCard(scrollChild, "Raid Marker Settings", yOffset)
+    table_insert(allWidgets, card4c)
+
+    -- Anchor dropdown and font size
+    local row4c1 = GUIFrame:CreateRow(card4c.content, 40)
+    local anchorDropdownMarker = GUIFrame:CreateDropdown(row4c1, "Anchor", anchorList,
+        db.TargetMarker.Anchor or "BOTTOM", 50,
+        function(key)
+            db.TargetMarker.Anchor = key
+            ApplySettings()
+        end)
+    row4c1:AddWidget(anchorDropdownMarker, 0.5)
+    table_insert(allWidgets, anchorDropdownMarker)
+
+    local targetFontSliderMarker = GUIFrame:CreateSlider(row4c1, "Size", 1, 100, 1,
+        db.TargetMarker.Size or 10, nil,
+        function(val)
+            db.TargetMarker.Size = val
+            ApplySettings()
+        end)
+    row4c1:AddWidget(targetFontSliderMarker, 0.5)
+    table_insert(allWidgets, targetFontSliderMarker)
+    card4c:AddRow(row4c1, 40)
+
+    -- X and Y Offset sliders
+    local row4c2 = GUIFrame:CreateRow(card4c.content, 40)
+    local targetXSliderMarker = GUIFrame:CreateSlider(row4c2, "X Offset", -100, 100, 1,
+        db.TargetMarker.XOffset or 0, nil,
+        function(val)
+            db.TargetMarker.XOffset = val
+            ApplySettings()
+        end)
+    row4c2:AddWidget(targetXSliderMarker, 0.5)
+    table_insert(allWidgets, targetXSliderMarker)
+
+    local targetYSliderMarker = GUIFrame:CreateSlider(row4c2, "Y Offset", -50, 100, 1,
+        db.TargetMarker.YOffset or 4, nil,
+        function(val)
+            db.TargetMarker.YOffset = val
+            ApplySettings()
+        end)
+    row4c2:AddWidget(targetYSliderMarker, 0.5)
+    table_insert(allWidgets, targetYSliderMarker)
+    card4c:AddRow(row4c2, 40)
+
+    yOffset = yOffset + card4c:GetContentHeight() + Theme.paddingSmall
+
+    ----------------------------------------------------------------
     -- Card 5: Colors (2 rows, 4 colors at 0.5 each)
     ----------------------------------------------------------------
     local card5 = GUIFrame:CreateCard(scrollChild, "Colors", yOffset)
