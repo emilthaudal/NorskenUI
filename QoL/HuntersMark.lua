@@ -77,6 +77,7 @@ end
 
 -- Main update func that we use to determine if text is to be shown or hidden
 function HUNTMARK:UpdateWarningDisplay()
+    if not isHunter then return end
     if self.isPreview then return end
     if not self.frame then return end
 
@@ -101,6 +102,7 @@ end
 -- Function that uses AuraUtil to check if hunter mark exists and its applied by the player
 -- We dont care about other hunters marks
 function HUNTMARK:CheckUnitForMark(unit)
+    if not isHunter then return end
     if not unit or not UnitExists(unit) or not UnitIsBossMob(unit) then return end
 
     local hasMarkNow = false
@@ -117,6 +119,7 @@ end
 
 -- Enable/disable nameplate scanning based on raid instance
 function HUNTMARK:SetScanningActive(active)
+    if not isHunter then return end
     if not self.scannerFrame then return end
 
     if active then
@@ -140,6 +143,7 @@ end
 
 -- Handle events to use for scanning
 function HUNTMARK:StartScanning()
+    if not isHunter then return end
     if self.isPreview then return end
     if self.scannerFrame then return end
 
