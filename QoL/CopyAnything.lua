@@ -2,6 +2,9 @@
 ---@class NRSKNUI
 local NRSKNUI = select(2, ...)
 
+-- Credit:
+-- Built on original WA code created by Nnoggie
+
 if not NorskenUI then
     error("CopyAnything: Addon object not initialized. Check file load order!")
     return
