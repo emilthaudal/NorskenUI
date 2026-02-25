@@ -100,7 +100,7 @@ local function CheckPetStatus()
     local specID = GetSpecializationInfo(specIndex)
 
     -- Check if current spec is MM Hunter (254) and if they are talented into Unbreakable Bond
-    if specID == 254 and IsPlayerSpell(1223323) then
+    if specID == 254 and IsPlayerSpell(466867) then
         return PET_STATUS.NONE, nil, nil
     end
 
