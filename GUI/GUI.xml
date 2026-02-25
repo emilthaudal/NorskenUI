@@ -37,6 +37,7 @@
     <Script file="GUITabs\GUI-Combat\GUI-PetTextsTab.lua" />
     <Script file="GUITabs\GUI-Combat\GUI-GatewayTab.lua" />
     <Script file="GUITabs\GUI-Combat\GUI-RangeChecker.lua" />
+    <Script file="GUITabs\GUI-Combat\GUI-TimeSpiral.lua" />
 
     <!-- GUI QoL Tabs -->
     <Script file="GUITabs\GUI-QoL\GUI-AutomationTab.lua" />

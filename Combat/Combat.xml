@@ -9,4 +9,5 @@
     <Script file="CombatMissingBuffs.lua" />
     <Script file="PetTexts.lua" />
     <Script file="RangeChecker.lua" />
+    <Script file="TimeSpiral.lua" />
 </Ui>

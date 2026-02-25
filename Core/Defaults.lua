@@ -41,6 +41,35 @@ local Defaults = {
         },
     },
     profile = {
+        TimeSpiral = {
+            Enabled = true,
+            IconSize = 40,
+            ShowText = true,
+            TextLabel = "FREE",
+            TextColor = { 0, 1, 0, 1 },
+
+            -- Glow
+            GlowEnabled = true,
+            GlowType = "proc", -- pixel, autocast, button, proc
+            GlowColor = { 0, 1, 0, 1 },
+
+            -- Font
+            FontFace = "Expressway",
+            FontSize = 14,
+            FontOutline = "SOFTOUTLINE",
+
+            -- Position
+            Strata = "HIGH",
+            anchorFrameType = "UIPARENT",
+            ParentFrame = "UIParent",
+            Position = {
+                AnchorFrom = "CENTER",
+                AnchorTo = "CENTER",
+                XOffset = -100,
+                YOffset = 0,
+            },
+        },
+
         RangeChecker = {
             Enabled = true,
             CombatOnly = false,
@@ -476,6 +505,14 @@ local Defaults = {
             },
             FocusCastbar = {
                 Enabled = true,
+
+                TargetMarker = {
+                    Enabled = true,
+                    Size = 30,
+                    XOffset = -30,
+                    YOffset = 0,
+                    Anchor = "LEFT",
+                },
 
                 Width = 300,
                 Height = 29,

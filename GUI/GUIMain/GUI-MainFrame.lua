@@ -57,6 +57,7 @@ GUIFrame.SidebarConfig = {
                 { id = "gateway",       text = "Gateway Alert" },
                 { id = "FocusCastbar",  text = "Focus Castbar" },
                 { id = "RangeChecker",  text = "Range Checker Text" },
+                { id = "TimeSpiral",    text = "Time Spiral" },
             }
         },
         {
