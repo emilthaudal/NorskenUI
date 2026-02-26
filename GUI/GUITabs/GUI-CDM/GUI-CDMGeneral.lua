@@ -139,7 +139,7 @@ GUIFrame:RegisterContent("CDM", function(scrollChild, yOffset)
 
     -- Essentials Font Size
     local row4 = GUIFrame:CreateRow(card2.content, 40)
-    local SizeEssentials = GUIFrame:CreateSlider(row4, "Essentials Font Size", 1, 25, 1,
+    local SizeEssentials = GUIFrame:CreateSlider(row4, "Essentials Font Size", 1, 100, 1,
         db.Cooldown.SizeEssentials, _,
         function(val)
             db.Cooldown.SizeEssentials = val
@@ -149,7 +149,7 @@ GUIFrame:RegisterContent("CDM", function(scrollChild, yOffset)
     table_insert(allWidgets, SizeEssentials)
 
     -- Utility Font Size
-    local SizeUtil = GUIFrame:CreateSlider(row4, "Utility Font Size", 1, 25, 1,
+    local SizeUtil = GUIFrame:CreateSlider(row4, "Utility Font Size", 1, 100, 1,
         db.Cooldown.SizeUtil, _,
         function(val)
             db.Cooldown.SizeUtil = val
@@ -177,7 +177,7 @@ GUIFrame:RegisterContent("CDM", function(scrollChild, yOffset)
     table_insert(allWidgets, ChargesFontColor)
 
     -- Charges Font Size
-    local ChargesSize = GUIFrame:CreateSlider(row5, "Charge Font Size", 1, 25, 1,
+    local ChargesSize = GUIFrame:CreateSlider(row5, "Charge Font Size", 1, 100, 1,
         db.Charges.Size, _,
         function(val)
             db.Charges.Size = val
