@@ -310,6 +310,20 @@ local Defaults = {
 
         -- Miscellaneous Settings
         Miscellaneous = {
+            Recuperate = {
+                Enabled = true,
+                Size = 40,
+                Strata = "HIGH",
+                anchorFrameType = "UIPARENT",
+                ParentFrame = "UIParent",
+                Position = {
+                    AnchorFrom = "CENTER",
+                    AnchorTo = "CENTER",
+                    XOffset = 0,
+                    YOffset = 150,
+                },
+            },
+
             AuctionHouseFilter = {
                 Enabled = true,
                 AuctionHouse = {

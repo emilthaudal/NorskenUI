@@ -51,6 +51,7 @@
     <Script file="GUITabs\GUI-QoL\GUI-CVars.lua" />
     <Script file="GUITabs\GUI-QoL\GUI-HuntersMark.lua" />
     <Script file="GUITabs\GUI-QoL\GUI-AuctionHouseFilter.lua" />
+    <Script file="GUITabs\GUI-QoL\GUI-Recuperate.lua" />
 
     <!-- GUI Skinning Tabs -->
     <Script file="GUITabs\GUISkinning\GUI-TooltipsTab.lua" />

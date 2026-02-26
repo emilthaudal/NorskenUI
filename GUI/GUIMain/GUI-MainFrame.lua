@@ -77,6 +77,7 @@ GUIFrame.SidebarConfig = {
                 { id = "Durability",      text = "Durability Util" },
                 { id = "HuntersMark",     text = "Hunters Mark Missing" },
                 { id = "AuctionHouseFilter", text = "AH Filter" },
+                { id = "Recuperate",    text = "Recuperate Button" },
             }
         },
         {
