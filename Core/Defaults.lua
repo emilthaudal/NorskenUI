@@ -152,6 +152,7 @@ local Defaults = {
                 bgHeight = 5,
 
             },
+            PrintEnd = false,
         },
 
         -- Combat Message Settings

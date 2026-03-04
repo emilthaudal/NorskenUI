@@ -216,8 +216,10 @@ function CT:OnExitCombat()
     self.startTime = 0
 
     -- Print duration to chat
-    local duration = FormatTime(NRSKNUI.lastCombatDuration, self.db.Format)
-    NRSKNUI:Print("Combat lasted " .. duration)
+    if self.db.PrintEnd then
+        local duration = FormatTime(NRSKNUI.lastCombatDuration, self.db.Format)
+        NRSKNUI:Print("Combat lasted " .. duration)
+    end
 
     self:ApplySettings()
     self:UpdateText()

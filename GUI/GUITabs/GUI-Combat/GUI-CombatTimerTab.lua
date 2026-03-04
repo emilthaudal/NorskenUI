@@ -96,7 +96,7 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
     ----------------------------------------------------------------
     local card1 = GUIFrame:CreateCard(scrollChild, "Combat Timer", yOffset)
 
-    local row1 = GUIFrame:CreateRow(card1.content, 36)
+    local row1 = GUIFrame:CreateRow(card1.content, 40)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Combat Timer", db.Enabled ~= false, function(checked)
             db.Enabled = checked
             ApplyCombatTimerState(checked)
@@ -117,7 +117,23 @@ GUIFrame:RegisterContent("combatTimer", function(scrollChild, yOffset)
         end)
     row1:AddWidget(formatDropdown, 0.5)
     table_insert(allWidgets, formatDropdown)
-    card1:AddRow(row1, 36)
+    card1:AddRow(row1, 40)
+
+    -- Separator
+    local row1sep = GUIFrame:CreateRow(card1.content, 8)
+    local sep1Card = GUIFrame:CreateSeparator(row1sep)
+    row1sep:AddWidget(sep1Card, 1)
+    table_insert(allWidgets, sep1Card)
+    card1:AddRow(row1sep, 8)
+
+    local row1a = GUIFrame:CreateRow(card1.content, 36)
+    local printCheck = GUIFrame:CreateCheckbox(row1a, "Enable Combat Duration Chat Print", db.PrintEnd ~= false, function(checked)
+        db.PrintEnd = checked
+        UpdateAllWidgetStates()
+    end)
+    row1a:AddWidget(printCheck, 1)
+    table_insert(allWidgets, printCheck)
+    card1:AddRow(row1a, 36)
 
     yOffset = yOffset + card1:GetContentHeight() + Theme.paddingSmall
 
