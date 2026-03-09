@@ -214,6 +214,9 @@ local Defaults = {
             Color = { 0, 1, 0.169, 1 },   -- Cross color (used when ColorMode = "custom")
             Thickness = 22,               -- Cross thickness (font size)
             Outline = true,               -- Outline enabled
+            RangeColorMeleeEnabled = false,   -- Color cross when out of melee range
+            RangeColorRangedEnabled = false,  -- Color cross when out of ranged casting range
+            OutOfRangeColor = { 1, 0, 0, 1 }, -- Color used when out of range
         },
 
         -- Battle Res Tracker Settings

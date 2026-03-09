@@ -29,6 +29,7 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
 
     local allWidgets = {}
     local colorModeWidgets = {}
+    local rangeColorWidgets = {} -- widgets that depend on RangeColorEnabled
 
     local function ApplySettings()
         if CC then
@@ -50,6 +51,7 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
     local function UpdateAllWidgetStates()
         local mainEnabled = db.Enabled ~= false
         local isCustomColor = (db.ColorMode or "custom") == "custom"
+        local isRangeEnabled = db.RangeColorMeleeEnabled == true or db.RangeColorRangedEnabled == true
 
         for _, widget in ipairs(allWidgets) do
             if widget.SetEnabled then
@@ -61,6 +63,11 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
             for _, widget in ipairs(colorModeWidgets) do
                 if widget.SetEnabled then
                     widget:SetEnabled(isCustomColor)
+                end
+            end
+            for _, widget in ipairs(rangeColorWidgets) do
+                if widget.SetEnabled then
+                    widget:SetEnabled(isRangeEnabled)
                 end
             end
         end
@@ -166,6 +173,44 @@ GUIFrame:RegisterContent("combatCross", function(scrollChild, yOffset)
     card4:AddRow(row4, 36)
 
     yOffset = yOffset + card4:GetContentHeight() + Theme.paddingSmall
+
+    ----------------------------------------------------------------
+    -- Card 5: Range Color Settings
+    ----------------------------------------------------------------
+    local card5 = GUIFrame:CreateCard(scrollChild, "Range Warning", yOffset)
+
+    local row5a = GUIFrame:CreateRow(card5.content, 36)
+    local meleRangeCheck = GUIFrame:CreateCheckbox(row5a, "Enable for melee specs", db.RangeColorMeleeEnabled == true,
+        function(checked)
+            db.RangeColorMeleeEnabled = checked
+            if CC then CC:ApplySettings() end
+            UpdateAllWidgetStates()
+        end)
+    row5a:AddWidget(meleRangeCheck, 1)
+    card5:AddRow(row5a, 36)
+
+    local row5b = GUIFrame:CreateRow(card5.content, 36)
+    local rangedRangeCheck = GUIFrame:CreateCheckbox(row5b, "Enable for ranged specs", db.RangeColorRangedEnabled == true,
+        function(checked)
+            db.RangeColorRangedEnabled = checked
+            if CC then CC:ApplySettings() end
+            UpdateAllWidgetStates()
+        end)
+    row5b:AddWidget(rangedRangeCheck, 1)
+    card5:AddRow(row5b, 36)
+
+    local row5c = GUIFrame:CreateRow(card5.content, 36)
+    local outOfRangeColorPicker = GUIFrame:CreateColorPicker(row5c, "Out of Range Color",
+        db.OutOfRangeColor or { 1, 0, 0, 1 },
+        function(r, g, b, a)
+            db.OutOfRangeColor = { r, g, b, a }
+            if CC then CC.lastInRange = nil end -- force re-eval
+        end)
+    row5c:AddWidget(outOfRangeColorPicker, 1)
+    table_insert(rangeColorWidgets, outOfRangeColorPicker)
+    card5:AddRow(row5c, 36)
+
+    yOffset = yOffset + card5:GetContentHeight() + Theme.paddingSmall
 
     UpdateAllWidgetStates()
     yOffset = yOffset - (Theme.paddingSmall * 3)
