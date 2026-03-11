@@ -160,6 +160,13 @@ end
 function TT:UpdateBackdrop(backdrop)
     if not self.db then return end
 
+    -- Secret-value safety check on the parent tooltip's width
+    -- Setting the backdrop triggers math on width/height which crashes on tainted/secret values
+    local parent = backdrop:GetParent()
+    if parent and issecretvalue and issecretvalue(parent:GetWidth()) then
+        return
+    end
+
     -- Apply backdrop settings
     backdrop:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
