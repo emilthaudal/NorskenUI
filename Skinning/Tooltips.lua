@@ -142,6 +142,20 @@ function TT:OnInitialize()
     self:SetEnabledState(false)
 end
 
+-- Apply backdrop visual config (bgFile, edgeFile, colors) to a frame
+local function ApplyBackdropConfig(backdrop, db)
+    backdrop:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = db.BorderSize or 1,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 },
+    })
+    local bgColor = db.BackgroundColor or { 0, 0, 0, 0.8 }
+    local borderColor = db.BorderColor or { 0, 0, 0, 1 }
+    backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
+    backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
+end
+
 -- Get or create custom backdrop for a tooltip
 function TT:GetOrCreateBackdrop(tooltip)
     if tooltipBackdrops[tooltip] then
@@ -155,16 +169,7 @@ function TT:GetOrCreateBackdrop(tooltip)
     -- Apply backdrop BEFORE SetAllPoints so dimensions are 0x0 (safe).
     -- WHITE8X8 is a solid pixel so UV coordinates don't matter visually.
     if self.db then
-        backdrop:SetBackdrop({
-            bgFile = "Interface\\Buttons\\WHITE8X8",
-            edgeFile = "Interface\\Buttons\\WHITE8X8",
-            edgeSize = self.db.BorderSize or 1,
-            insets = { left = 0, right = 0, top = 0, bottom = 0 },
-        })
-        local bgColor = self.db.BackgroundColor or { 0, 0, 0, 0.8 }
-        local borderColor = self.db.BorderColor or { 0, 0, 0, 1 }
-        backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
-        backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
+        ApplyBackdropConfig(backdrop, self.db)
     end
 
     backdrop:SetAllPoints(tooltip)
@@ -183,19 +188,7 @@ function TT:UpdateBackdrop(backdrop)
         return
     end
 
-    -- Apply backdrop settings
-    backdrop:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = self.db.BorderSize or 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
-
-    local bgColor = self.db.BackgroundColor or { 0, 0, 0, 0.8 }
-    local borderColor = self.db.BorderColor or { 0, 0, 0, 1 }
-
-    backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
-    backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
+    ApplyBackdropConfig(backdrop, self.db)
 end
 
 -- Fetch color info from unit if unit is a player
