@@ -200,20 +200,23 @@ local Defaults = {
 
         -- Combat Cross Settings
         CombatCross = {
-            Enabled = true,               -- Enable/disable combat cross
-            Strata = "HIGH",              -- Frame strata
-            anchorFrameType = "UIPARENT", -- Anchor frame type (SCREEN, UIPARENT, SELECTFRAME)
-            ParentFrame = "UIParent",     -- Parent frame name (when SELECTFRAME)
-            Position = {                  -- Position settings
-                AnchorFrom = "CENTER",    -- Anchor point from
-                AnchorTo = "CENTER",      -- Anchor point to
-                XOffset = 0,              -- X offset
-                YOffset = -10,            -- Y offset
+            Enabled = true,                   -- Enable/disable combat cross
+            Strata = "HIGH",                  -- Frame strata
+            anchorFrameType = "UIPARENT",     -- Anchor frame type (SCREEN, UIPARENT, SELECTFRAME)
+            ParentFrame = "UIParent",         -- Parent frame name (when SELECTFRAME)
+            Position = {                      -- Position settings
+                AnchorFrom = "CENTER",        -- Anchor point from
+                AnchorTo = "CENTER",          -- Anchor point to
+                XOffset = 0,                  -- X offset
+                YOffset = -10,                -- Y offset
             },
-            ColorMode = "custom",         -- Color mode: "class" | "custom" | "theme"
-            Color = { 0, 1, 0.169, 1 },   -- Cross color (used when ColorMode = "custom")
-            Thickness = 22,               -- Cross thickness (font size)
-            Outline = true,               -- Outline enabled
+            ColorMode = "custom",             -- Color mode: "class" | "custom" | "theme"
+            Color = { 0, 1, 0.169, 1 },       -- Cross color (used when ColorMode = "custom")
+            Thickness = 22,                   -- Cross thickness (font size)
+            Outline = true,                   -- Outline enabled
+            RangeColorMeleeEnabled = false,   -- Color cross when out of melee range
+            RangeColorRangedEnabled = false,  -- Color cross when out of ranged casting range
+            OutOfRangeColor = { 1, 0, 0, 1 }, -- Color used when out of range
         },
 
         -- Battle Res Tracker Settings
@@ -313,6 +316,8 @@ local Defaults = {
         Miscellaneous = {
             Recuperate = {
                 Enabled = true,
+                LoadInRaid = true,
+                LoadInParty = false,
                 Size = 40,
                 Strata = "HIGH",
                 anchorFrameType = "UIPARENT",
