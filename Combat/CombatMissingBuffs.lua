@@ -30,7 +30,7 @@ local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local issecretvalue = issecretvalue
 local GetShapeshiftForm, GetShapeshiftFormInfo = GetShapeshiftForm, GetShapeshiftFormInfo
 local tostring, tonumber = tostring, tonumber
-local C_Spell, C_SpellBook, C_SpellActivationOverlay = C_Spell, C_SpellBook, C_SpellActivationOverlay
+local C_Spell, C_SpellBook = C_Spell, C_SpellBook
 local C_PetBattles, C_ChallengeMode = C_PetBattles, C_ChallengeMode
 local AuraUtil = AuraUtil
 local UIParent = UIParent
@@ -45,58 +45,68 @@ local GENERALBUFF_TEXT = ""
 -- Default icon for weapon enchants
 local WEAPON_ENCHANT_ICON = 136244
 
--- Map CUSTOM_BUFFS categories to db.Consumables keys
-local CATEGORY_TO_DB_KEY = {
-    FLASK = "Flask",
-    FOOD = "Food",
-    MH_ENCHANT = "MHEnchant",
-    OH_ENCHANT = "OHEnchant",
-    RUNE = "Rune",
+-- SAFE_BUFFS: Always trackable, never secret spellIds
+local SAFE_BUFFS = {
+    -- Raid Buffs
+    { spellId = 1126,   class = "DRUID",   buffType = "raid" },                          -- Mark of the Wild
+    { spellId = 1459,   class = "MAGE",    buffType = "raid" },                          -- Arcane Intellect
+    { spellId = 6673,   class = "WARRIOR", buffType = "raid", ignoreRangeCheck = true }, -- Battle Shout
+    { spellId = 21562,  class = "PRIEST",  buffType = "raid" },                          -- Power Word: Fortitude
+    { spellId = 462854, class = "SHAMAN",  buffType = "raid" },                          -- Skyfury
+    {
+        spellId = 381748,
+        class = "EVOKER",
+        buffType = "raid",
+        ignoreRangeCheck = true,
+        extraBuffSpellIds = { 381732, 381741, 381746, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758 }
+    }, -- Blessing of the Bronze
+
+    -- Rogue Poisons (self buffs)
+    { spellId = 2823,             class = "ROGUE", buffType = "poison", poisonType = "lethal" },    -- Deadly Poison
+    { spellId = 8679,             class = "ROGUE", buffType = "poison", poisonType = "lethal" },    -- Wound Poison
+    { spellId = 315584,           class = "ROGUE", buffType = "poison", poisonType = "lethal" },    -- Instant Poison
+    { spellId = 381664,           class = "ROGUE", buffType = "poison", poisonType = "lethal" },    -- Amplifying Poison
+    { spellId = 3408,             class = "ROGUE", buffType = "poison", poisonType = "nonlethal" }, -- Crippling Poison
+    { spellId = 5761,             class = "ROGUE", buffType = "poison", poisonType = "nonlethal" }, -- Numbing Poison
+    { spellId = 381637,           class = "ROGUE", buffType = "poison", poisonType = "nonlethal" }, -- Atrophic Poison
+
+    -- Weapon Enchants
+    { buffType = "weaponEnchant", slot = "main",   text = "MH",         dbKey = "MHEnchant" },
+    { buffType = "weaponEnchant", slot = "off",    text = "OH",         dbKey = "OHEnchant" },
 }
 
--- Class buff definitions
-local CLASS_BUFFS = {
-    ["DRUID"] = {
-        { spellId = 1126, text = GENERALBUFF_TEXT }, -- Mark of the Wild
-    },
-    ["EVOKER"] = {
-        {
-            spellId = 381748,
-            spellbookId = 364342,
-            text = GENERALBUFF_TEXT,
-            ignoreRangeCheck = true,
-            extraBuffSpellIds = { 381732, 381741, 381746, 381749, 381750, 381751, 381752, 381753, 381754, 381756, 381757, 381758, 442744, 432658, 432652, 432655 }
-        }, -- Blessing of the Bronze
-    },
-    ["MAGE"] = {
-        { spellId = 1459, text = GENERALBUFF_TEXT },                                                            -- Arcane Intellect
-        { spellId = 210126, spellbookId = 205022, text = GENERALBUFF_TEXT, specIds = { 62 }, onlySelf = true }, -- Arcane Familiar
-    },
-    ["PRIEST"] = {
-        { spellId = 21562, text = GENERALBUFF_TEXT }, -- Power Word: Fortitude
-    },
-    ["SHAMAN"] = {
-        { spellId = 462854, text = GENERALBUFF_TEXT }, -- Skyfury
-    },
-    ["WARRIOR"] = {
-        { spellId = 6673, text = GENERALBUFF_TEXT, ignoreRangeCheck = true }, -- Battle Shout
-    },
+-- Food buff names, used ID's before but for my own sanity, we just check name instead (There are a million different food types and ID's :))
+local WELL_FED_NAME = C_Spell.GetSpellName(19705)
+local HEARTY_WELL_FED_NAME = C_Spell.GetSpellName(462187)
+
+-- RESTRICTED_BUFFS: Secret spellIds, skip in combat/M+
+local RESTRICTED_BUFFS = {
+    -- Flasks
+    { spellId = 1235110, category = "Flask" }, -- Flask of the Blood Knights
+    { spellId = 1235057, category = "Flask" }, -- Flask of Thalassian Resistance
+    { spellId = 1235111, category = "Flask" }, -- Flask of the Shattered Sun
+    { spellId = 1235108, category = "Flask" }, -- Flask of the Magisters
+    { spellId = 432021,  category = "Flask" }, -- Alchemical Chaos
+    { spellId = 431971,  category = "Flask" }, -- Flask of Tempered Aggression
+    { spellId = 431972,  category = "Flask" }, -- Flask of Tempered Swiftness
+    { spellId = 431974,  category = "Flask" }, -- Flask of Tempered Mastery
+    { spellId = 431973,  category = "Flask" }, -- Flask of Tempered Versatility
+
+    -- Spec-specific self buffs
+    {
+        spellId = 210126,
+        class = "MAGE",
+        specId = 62,
+        talentId = 205022,
+        buffType = "self",
+        onlySelf = true
+    }, -- Arcane Familiar
 }
 
--- Rogue poison spell IDs
-local ROGUE_POISONS = {
-    -- Non-lethal poisons
-    { spellId = 381637, poisonType = "nonlethal" }, -- Atrophic Poison
-    { spellId = 5761,   poisonType = "nonlethal" }, -- Numbing Poison
-    { spellId = 3408,   poisonType = "nonlethal" }, -- Crippling Poison
-    -- Lethal poisons
-    { spellId = 381664, poisonType = "lethal" }, -- Amplifying Poison
-    { spellId = 2823,   poisonType = "lethal" }, -- Deadly Poison
-    { spellId = 315584, poisonType = "lethal" }, -- Instant Poison
-    { spellId = 8679,   poisonType = "lethal" }, -- Wound Poison
-}
+-- Assassination talent that allows 2 lethal + 2 non-lethal
+local ASSA_DOUBLE_POISON_TALENT = 381801
 
--- Rogue poison spell IDs for easy reference
+-- Poison spell IDs for icon display
 local POISON_IDS = {
     ATROPHIC = 381637,
     NUMBING = 5761,
@@ -105,36 +115,6 @@ local POISON_IDS = {
     DEADLY = 2823,
     INSTANT = 315584,
     WOUND = 8679,
-}
-
--- Assassination talent that allows 2 lethal + 2 non-lethal
-local ASSA_DOUBLE_POISON_TALENT = 381801
-
--- Custom buff table
-local CUSTOM_BUFFS = {
-    -- Midnight Flasks
-    { category = "FLASK",      spellId = 1235110,   enabled = true }, -- Flask of the Blood Knights (Haste)
-    { category = "FLASK",      spellId = 1235057,   enabled = true }, -- Flask of Thalassian Resistance (Vers)
-    { category = "FLASK",      spellId = 1235111,   enabled = true }, -- Flask of the Shattered Sun (Crit)
-    { category = "FLASK",      spellId = 1235108,   enabled = true }, -- Flask of the Magisters (Mastery)
-    -- TWW Flasks
-    { category = "FLASK",      spellId = 432021,    enabled = true }, -- Alchemical Chaos
-    { category = "FLASK",      spellId = 431971,    enabled = true }, -- Flask of Tempered Aggression
-    { category = "FLASK",      spellId = 431972,    enabled = true }, -- Flask of Tempered Swiftness
-    { category = "FLASK",      spellId = 431974,    enabled = true }, -- Flask of Tempered Mastery
-    { category = "FLASK",      spellId = 431973,    enabled = true }, -- Flask of Tempered Versatility
-    -- Food
-    { category = "FOOD",       spellId = 457284,    enabled = true }, -- Well Fed (Mainstat)
-    { category = "FOOD",       spellId = 1232585,   enabled = true }, -- Well Fed (Stamina + Mainstat)
-    { category = "FOOD",       spellId = 461959,    enabled = true }, -- Well Fed (Crit)
-    { category = "FOOD",       spellId = 461960,    enabled = true }, -- Well Fed (Haste)
-    { category = "FOOD",       spellId = 462210,    enabled = true }, -- Hearty Well Fed (Mainstat)
-    { category = "FOOD",       spellId = 462181,    enabled = true }, -- Hearty Well Fed (Crit)
-    { category = "FOOD",       spellId = 462183,    enabled = true }, -- Hearty Well Fed (Mastery)
-    { category = "FOOD",       spellId = 462180,    enabled = true }, -- Hearty Well Fed (Haste)
-    -- Weapon enchants
-    { category = "MH_ENCHANT", weaponSlot = "main", text = "MH",   enabled = true },
-    { category = "OH_ENCHANT", weaponSlot = "off",  text = "OH",   enabled = true },
 }
 
 -- Spec ID to name mapping for each class
@@ -173,7 +153,6 @@ end
 
 -- Module state
 local playerClass = nil
-local playerBuffs = nil
 local isThrottled = false
 local lastCheckTime = 0
 
@@ -208,7 +187,7 @@ local function IsLoadConditionMet(loadCondition)
     return true -- Default to true for unknown conditions
 end
 
--- Small helper to get spell info and texture
+-- Small helpers to get spell info and texture
 local function IsSpellKnown(spellId)
     return spellId and C_SpellBook.IsSpellKnown(spellId)
 end
@@ -227,7 +206,7 @@ local function IsValidTarget(unit)
     if not UnitIsConnected(unit) then return false end
     if not UnitIsPlayer(unit) then return false end
     if not UnitCanAssist("player", unit) then return false end
-    -- Filter out units not in the same instance as the player
+    -- Filter out units not in the same instance as the player, ty echo wizards for suggestion
     local _, _, _, playerInstanceId = UnitPosition("player")
     local _, _, _, unitInstanceId = UnitPosition(unit)
     if playerInstanceId and unitInstanceId and playerInstanceId ~= unitInstanceId then
@@ -236,10 +215,9 @@ local function IsValidTarget(unit)
     return true
 end
 
--- Helper to Check player buff status
+-- Check player buff status
 local function PlayerHasBuff(spellId, extraSpellIds)
     if not spellId then return false, nil end
-    if issecretvalue(spellId) or issecretvalue(extraSpellIds) then return end
 
     local hasBuff = false
     local expirationTime = nil
@@ -269,15 +247,14 @@ local function PlayerHasBuff(spellId, extraSpellIds)
     return hasBuff, expirationTime
 end
 
--- Helper to Check unit buff status
+-- Check unit buff status
 local function UnitHasBuff(unit, spellId, extraSpellIds)
-    if issecretvalue(unit) then return end
+    if issecretvalue(unit) or issecretvalue(spellId) or issecretvalue(extraSpellIds) then return end
     if not unit or not IsValidTarget(unit) then return true end
-    if issecretvalue(spellId) or issecretvalue(extraSpellIds) then return end
-
     local hasBuff = false
 
     AuraUtil.ForEachAura(unit, "HELPFUL", nil, function(auraInfo)
+        if issecretvalue(auraInfo) or issecretvalue(auraInfo.spellId) then return end -- Note, still need these checks since they can try to check any aura
         if not auraInfo or not auraInfo.spellId then return false end
 
         if auraInfo.spellId == spellId then
@@ -299,14 +276,115 @@ local function UnitHasBuff(unit, spellId, extraSpellIds)
     return hasBuff
 end
 
--- Helper to get buff-providing classes present in the group
--- also checks if the unit is in the same instance, if not, dont show icon
+-- Check if we should track the buff at all
+local function ShouldTrackBuff(buff)
+    -- Class check
+    if buff.class and buff.class ~= playerClass then return false end
+
+    -- Spec check
+    if buff.specId then
+        local currentSpec = GetSpecialization()
+        if currentSpec then
+            local specId = GetSpecializationInfo(currentSpec)
+            if specId ~= buff.specId then return false end
+        else
+            return false
+        end
+    end
+
+    -- Talent check
+    if buff.talentId and not IsSpellKnown(buff.talentId) then return false end
+
+    -- User settings enabled check
+    local dbKey = buff.dbKey or buff.category
+    if dbKey and MBUFFS.db then
+        local settings = MBUFFS.db.Consumables and MBUFFS.db.Consumables[dbKey]
+        if settings then
+            if settings.Enabled == false then return false end
+            if not IsLoadConditionMet(settings.LoadCondition) then return false end
+        end
+    end
+
+    return true
+end
+
+-- Check buff status and return count info for raid buffs
+local function CheckBuffWithCount(buff)
+    local result = {
+        isMissing = false,
+        needsReapply = false,
+        buffedCount = 0,
+        totalCount = 0,
+        buff = buff,
+    }
+
+    -- Player check
+    local hasBuff, expTime = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
+    if hasBuff then
+        result.buffedCount = 1
+    else
+        result.isMissing = true
+    end
+
+    -- Reapply check
+    if expTime and expTime > 0 then
+        local timeLeft = (expTime - GetTime()) / 60
+        if MBUFFS.db and MBUFFS.db.NotifyLowDuration and timeLeft <= MBUFFS.db.LowDurationThreshold then
+            result.needsReapply = true
+        end
+    end
+
+    -- Group check for raid buffs
+    if buff.buffType == "raid" and not buff.onlySelf then
+        local groupSize = GetNumGroupMembers()
+        if groupSize > 0 then
+            result.totalCount = 1 -- Start with player
+
+            local units = IsInRaid() and UNIT_STRINGS.raid or UNIT_STRINGS.party
+            local maxIndex = IsInRaid() and groupSize or (groupSize - 1)
+
+            for i = 1, maxIndex do
+                local unit = units[i]
+                if IsValidTarget(unit) then
+                    result.totalCount = result.totalCount + 1
+                    if UnitHasBuff(unit, buff.spellId, buff.extraBuffSpellIds) then
+                        result.buffedCount = result.buffedCount + 1
+                    elseif not result.isMissing then
+                        -- Check range
+                        if buff.ignoreRangeCheck or C_Spell.IsSpellInRange(buff.spellId, unit) then
+                            result.isMissing = true
+                        end
+                    end
+                end
+            end
+        else
+            result.totalCount = 1
+        end
+    else
+        result.totalCount = 1
+    end
+
+    return result
+end
+
+-- Format display text for buffs
+local function GetBuffDisplayText(buff, checkResult, isOwnClassBuff)
+    if buff.text then return buff.text end
+
+    -- Raid buffs, show count if player is the class that provides this buff, feature requested by Sir
+    if buff.buffType == "raid" and isOwnClassBuff and checkResult and checkResult.totalCount > 1 then
+        return checkResult.buffedCount .. "/" .. checkResult.totalCount
+    end
+    return ""
+end
+
+-- Get buff-providing classes present in the group and in the same instance as the player
 local function GetGroupBuffClasses()
     local classesInGroup = {}
     local groupSize = GetNumGroupMembers()
     local _, _, _, playerInstanceId = UnitPosition("player")
 
-    -- Solo, only check player's own class
+    -- Solo we only check player's own class
     if groupSize == 0 then
         if playerClass then
             classesInGroup[playerClass] = true
@@ -321,25 +399,23 @@ local function GetGroupBuffClasses()
                 local _, _, _, unitInstanceId = UnitPosition(unit)
                 if not playerInstanceId or not unitInstanceId or playerInstanceId == unitInstanceId then
                     local _, class = UnitClass(unit)
-                    if class and CLASS_BUFFS[class] then
+                    if class then
                         classesInGroup[class] = true
                     end
                 end
             end
         end
     else
-        -- Check player
         if playerClass then
             classesInGroup[playerClass] = true
         end
-        -- Check party members
         for i = 1, groupSize - 1 do
             local unit = UNIT_STRINGS.party[i]
             if UnitExists(unit) and UnitIsConnected(unit) and not UnitIsDeadOrGhost(unit) then
                 local _, _, _, unitInstanceId = UnitPosition(unit)
                 if not playerInstanceId or not unitInstanceId or playerInstanceId == unitInstanceId then
                     local _, class = UnitClass(unit)
-                    if class and CLASS_BUFFS[class] then
+                    if class then
                         classesInGroup[class] = true
                     end
                 end
@@ -350,88 +426,6 @@ local function GetGroupBuffClasses()
     return classesInGroup
 end
 
--- Check if player is missing a raid buff that someone in group can provide
-local function CheckMissingRaidBuffsFromGroup()
-    local missing = {}
-    local groupSize = GetNumGroupMembers()
-
-    -- Only check when in a group
-    if groupSize == 0 then return missing end
-
-    local classesInGroup = GetGroupBuffClasses()
-
-    -- Check each class's buffs
-    for class, _ in pairs(classesInGroup) do
-        if class ~= playerClass then
-            local classBuffs = CLASS_BUFFS[class]
-            if classBuffs then
-                for _, buff in ipairs(classBuffs) do
-                    if not buff.onlySelf then
-                        local hasBuff = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
-                        if not hasBuff then
-                            missing[#missing + 1] = {
-                                buff = buff,
-                                text = GENERALBUFF_TEXT,
-                            }
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    return missing
-end
-
--- Check buff status
-local function CheckBuffStatus(buff)
-    if InCombatLockdown() then return false, false end
-    if issecretvalue(buff) then return end
-
-    local hasBuff, expirationTime = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
-    if not hasBuff then
-        return true, false
-    end
-
-    local needsReapply = false
-    if expirationTime and expirationTime > 0 then
-        local timeLeft = expirationTime - GetTime()
-        local durationMinutes = timeLeft / 60
-        if MBUFFS.db and MBUFFS.db.NotifyLowDuration and durationMinutes <= MBUFFS.db.LowDurationThreshold then
-            needsReapply = true
-        end
-    end
-
-    if buff.onlySelf then
-        return false, needsReapply
-    end
-
-    local groupSize = GetNumGroupMembers()
-    if groupSize > 0 then
-        if IsInRaid() then
-            for i = 1, groupSize do
-                local unit = UNIT_STRINGS.raid[i]
-                if IsValidTarget(unit) and not UnitHasBuff(unit, buff.spellId, buff.extraBuffSpellIds) then
-                    if buff.ignoreRangeCheck or C_Spell.IsSpellInRange(buff.spellId, unit) then
-                        return true, false
-                    end
-                end
-            end
-        else
-            for i = 1, groupSize - 1 do
-                local unit = UNIT_STRINGS.party[i]
-                if IsValidTarget(unit) and not UnitHasBuff(unit, buff.spellId, buff.extraBuffSpellIds) then
-                    if buff.ignoreRangeCheck or C_Spell.IsSpellInRange(buff.spellId, unit) then
-                        return true, false
-                    end
-                end
-            end
-        end
-    end
-
-    return false, needsReapply
-end
-
 -- Check weapon enchant status
 local function HasWeaponEnchant(slot)
     local hasMain, _, _, _, hasOff = GetWeaponEnchantInfo()
@@ -439,16 +433,12 @@ local function HasWeaponEnchant(slot)
     if not slotName then return nil, nil, false end
     local slotID = GetInventorySlotInfo(slotName)
     local itemLink = GetInventoryItemLink("player", slotID)
-    if not itemLink then
-        return nil, nil, false
-    end
+    if not itemLink then return nil, nil, false end
 
     local _, _, _, _, _, _, _, _, equipLoc = GetItemInfo(itemLink)
     if not equipLoc then return nil, nil, false end
 
-    if equipLoc == "INVTYPE_SHIELD" or equipLoc == "INVTYPE_HOLDABLE" then
-        return nil, nil, false
-    end
+    if equipLoc == "INVTYPE_SHIELD" or equipLoc == "INVTYPE_HOLDABLE" then return nil, nil, false end
 
     local hasEnchant
     if slot == "main" then
@@ -458,182 +448,243 @@ local function HasWeaponEnchant(slot)
     end
     local icon = GetInventoryItemTexture("player", slotID)
 
-    if not icon then
-        return hasEnchant, nil, false
-    end
-
+    if not icon then return hasEnchant, nil, false end
     return hasEnchant, icon, true
 end
 
--- Check custom buff status
-local function CheckCustomBuffs()
-    local db = MBUFFS.db
-    if not db then return {} end
-    local consumablesDb = db.Consumables or {}
+-- Check buffs that blizzy made non secret so we can check these always
+local function CheckSafeBuffs()
     local missing = {}
-    local categorySeen = {}
-    local categorySatisfied = {}
-    local categoryIcon = {}
-    local categoryEnabled = {}
+    if not MBUFFS.db then return missing end
+    local consumablesDb = MBUFFS.db.Consumables or {}
+    local raidBuffsSettings = consumablesDb.RaidBuffs or {}
+    local raidBuffsEnabled = raidBuffsSettings.Enabled ~= false
+    local raidBuffsLoadMet = IsLoadConditionMet(raidBuffsSettings.LoadCondition)
+    local poisonSettings = consumablesDb.Poisons or {}
+    local poisonsEnabled = poisonSettings.Enabled ~= false
+    local poisonsLoadMet = IsLoadConditionMet(poisonSettings.LoadCondition)
 
-    -- Pre-check which categories are enabled and meet load conditions
-    for category, dbKey in pairs(CATEGORY_TO_DB_KEY) do
-        local catSettings = consumablesDb[dbKey]
-        if catSettings then
-            local enabled = catSettings.Enabled ~= false
-            local loadMet = IsLoadConditionMet(catSettings.LoadCondition)
-            categoryEnabled[category] = enabled and loadMet
-        else
-            -- Default to enabled if no settings found
-            categoryEnabled[category] = true
-        end
-    end
+    -- Track which buff classes are in the group
+    local groupBuffClasses = GetGroupBuffClasses()
 
-    -- Check what buffs are present
-    for _, buff in ipairs(CUSTOM_BUFFS) do
-        local category = buff.category
-        if category and categoryEnabled[category] then
-            if buff.weaponSlot then
-                local hasEnchant, icon, hasItem = HasWeaponEnchant(buff.weaponSlot)
-                if hasItem then
-                    if hasEnchant ~= nil then
-                        categoryIcon[category] = icon or WEAPON_ENCHANT_ICON
-                    end
-                    if hasEnchant == true then
-                        categorySatisfied[category] = true
-                    end
-                end
-            elseif buff.spellId then
-                if PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds) then
-                    categorySatisfied[category] = true
+    -- Poison tracking state
+    local lethalCount = 0
+    local nonLethalCount = 0
+    local spec = GetSpecialization()
+    local specId = spec and GetSpecializationInfo(spec)
+    local isAssassination = specId == 259
+    local hasDoublePoisonTalent = isAssassination and IsSpellKnown(ASSA_DOUBLE_POISON_TALENT)
+    local requiredLethal = hasDoublePoisonTalent and 2 or 1
+    local requiredNonLethal = hasDoublePoisonTalent and 2 or 1
+
+    -- Count poisons player has
+    if playerClass == "ROGUE" and poisonsEnabled and poisonsLoadMet then
+        for _, buff in ipairs(SAFE_BUFFS) do
+            if buff.buffType == "poison" and PlayerHasBuff(buff.spellId) then
+                if buff.poisonType == "lethal" then
+                    lethalCount = lethalCount + 1
+                else
+                    nonLethalCount = nonLethalCount + 1
                 end
             end
         end
     end
 
-    -- Create missing notifications for unsatisfied categories
-    for _, buff in ipairs(CUSTOM_BUFFS) do
-        local category = buff.category
-        if category and categoryEnabled[category] then
-            if not categorySatisfied[category] and not categorySeen[category] then
-                categorySeen[category] = true
+    -- Check raid buffs
+    for _, buff in ipairs(SAFE_BUFFS) do
+        if buff.buffType == "raid" and raidBuffsEnabled and raidBuffsLoadMet then
+            local isOwnClassBuff = buff.class == playerClass
 
-                local icon = categoryIcon[category]
+            if isOwnClassBuff then
+                -- Player can cast this buff
+                -- Shows count checker of total elligible units in the instance vs units that currently have buff, for example "5/20"
+                if IsSpellKnown(buff.spellId) then
+                    local result = CheckBuffWithCount(buff)
+                    if result.isMissing or result.needsReapply then
+                        local displayText = GetBuffDisplayText(buff, result, true)
+                        missing[#missing + 1] = {
+                            buff = buff,
+                            text = displayText,
+                            checkResult = result,
+                        }
+                    end
+                end
+            else
+                -- Buff from another class, only show if that class is in group and player themselves is missing it
+                if groupBuffClasses[buff.class] then
+                    local hasBuff = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
+                    if not hasBuff then
+                        missing[#missing + 1] = {
+                            buff = buff,
+                            text = "",
+                        }
+                    end
+                end
+            end
+        end
+    end
 
-                if buff.weaponSlot and not icon then
-                    -- Skip creating icon if no weapon
-                else
-                    missing[#missing + 1] = {
-                        buff = {
-                            spellId = buff.spellId or 0,
-                            text = buff.text,
-                            iconTexture = buff.iconTexture or icon,
-                        },
+    -- Check weapon enchants
+    for _, buff in ipairs(SAFE_BUFFS) do
+        if buff.buffType == "weaponEnchant" and ShouldTrackBuff(buff) then
+            local hasEnchant, icon, hasItem = HasWeaponEnchant(buff.slot)
+            if hasItem and not hasEnchant then
+                missing[#missing + 1] = {
+                    buff = {
+                        spellId = 0,
                         text = buff.text,
-                        isCustom = true,
+                        iconTexture = icon or WEAPON_ENCHANT_ICON,
+                    },
+                    text = buff.text,
+                }
+            end
+        end
+    end
+
+    -- Check rogue poisons
+    if playerClass == "ROGUE" and poisonsEnabled and poisonsLoadMet then
+        local lethalMissing = requiredLethal - lethalCount
+        local nonLethalMissing = requiredNonLethal - nonLethalCount
+
+        if lethalMissing > 0 then
+            local lethalIcons = {}
+            if isAssassination then
+                lethalIcons[1] = POISON_IDS.DEADLY
+                if hasDoublePoisonTalent then
+                    lethalIcons[2] = IsSpellKnown(POISON_IDS.AMPLIFYING) and POISON_IDS.AMPLIFYING or POISON_IDS.INSTANT
+                end
+            else
+                lethalIcons[1] = POISON_IDS.INSTANT
+            end
+
+            for i = 1, lethalMissing do
+                local iconSpellId = lethalIcons[i] or lethalIcons[1]
+                missing[#missing + 1] = {
+                    buff = { spellId = iconSpellId, text = "" },
+                    text = "",
+                }
+            end
+        end
+
+        if nonLethalMissing > 0 then
+            local nonLethalIcons = {}
+            nonLethalIcons[1] = POISON_IDS.ATROPHIC
+            if hasDoublePoisonTalent then
+                nonLethalIcons[2] = POISON_IDS.CRIPPLING
+            end
+
+            for i = 1, nonLethalMissing do
+                local iconSpellId = nonLethalIcons[i] or nonLethalIcons[1]
+                missing[#missing + 1] = {
+                    buff = { spellId = iconSpellId, text = "" },
+                    text = "",
+                }
+            end
+        end
+    end
+
+    return missing
+end
+
+-- Check for food buff by name
+local function PlayerHasFoodBuff()
+    local hasBuff = false
+    local foundSpellId = nil
+
+    AuraUtil.ForEachAura("player", "HELPFUL", nil, function(auraInfo)
+        if not auraInfo or not auraInfo.name then return false end
+
+        if auraInfo.name == WELL_FED_NAME or auraInfo.name == HEARTY_WELL_FED_NAME then
+            hasBuff = true
+            foundSpellId = auraInfo.spellId
+            return true
+        end
+        return false
+    end, true)
+
+    return hasBuff, foundSpellId
+end
+
+-- Check buffs that are still secret in combat/m+
+local function CheckRestrictedBuffs()
+    local missing = {}
+    if not MBUFFS.db then return missing end
+    if InCombatLockdown() or C_ChallengeMode.IsChallengeModeActive() then return missing end -- Skip in combat or M+
+    local consumablesDb = MBUFFS.db.Consumables or {}
+    local categorySatisfied = {}
+
+    -- Check food by name
+    local foodSettings = consumablesDb.Food or {}
+    if foodSettings.Enabled ~= false and IsLoadConditionMet(foodSettings.LoadCondition) then
+        local hasFood = PlayerHasFoodBuff()
+        if hasFood then
+            categorySatisfied["Food"] = true
+        end
+    end
+
+    -- Check flask and self buffs
+    for _, buff in ipairs(RESTRICTED_BUFFS) do
+        if ShouldTrackBuff(buff) then
+            if buff.category then
+                -- Flask category
+                if not categorySatisfied[buff.category] then
+                    if PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds) then
+                        categorySatisfied[buff.category] = true
+                    end
+                end
+            elseif buff.buffType == "self" then
+                -- Self buff, like Arcane Familiar
+                local hasBuff = PlayerHasBuff(buff.spellId, buff.extraBuffSpellIds)
+                if not hasBuff then
+                    missing[#missing + 1] = {
+                        buff = buff,
+                        text = "",
                     }
                 end
             end
         end
     end
 
-    return missing
-end
-
--- Check rogue poisons
-local function CheckRoguePoisons()
-    if playerClass ~= "ROGUE" then return {} end
-
-    local db = MBUFFS.db
-    if not db then return {} end
-
-    -- Check if poison tracking is enabled
-    local consumablesDb = db.Consumables or {}
-    local poisonSettings = consumablesDb.Poisons or {}
-    if poisonSettings.Enabled == false then return {} end
-
-    -- Check load condition
-    if not IsLoadConditionMet(poisonSettings.LoadCondition) then return {} end
-
-    local missing = {}
-    local spec = GetSpecialization()
-    if not spec then return missing end
-    local specId = GetSpecializationInfo(spec)
-
-    -- Special handling for Assa rogue with their Tempered Blades talents
-    local isAssassination = specId == 259
-    local hasDoublePoisonTalent = isAssassination and IsSpellKnown(ASSA_DOUBLE_POISON_TALENT)
-
-    -- Determine required counts
-    local requiredLethal = hasDoublePoisonTalent and 2 or 1
-    local requiredNonLethal = hasDoublePoisonTalent and 2 or 1
-
-    -- Count current poisons
-    local lethalCount = 0
-    local nonLethalCount = 0
-
-    for _, poison in ipairs(ROGUE_POISONS) do
-        if PlayerHasBuff(poison.spellId) then
-            if poison.poisonType == "lethal" then
-                lethalCount = lethalCount + 1
-            else
-                nonLethalCount = nonLethalCount + 1
-            end
-        end
-    end
-
-    -- Calculate missing counts
-    local lethalMissing = requiredLethal - lethalCount
-    local nonLethalMissing = requiredNonLethal - nonLethalCount
-
-    if lethalMissing > 0 then
-        local lethalIcons = {}
-        if isAssassination then
-            lethalIcons[1] = POISON_IDS.DEADLY
-            if hasDoublePoisonTalent then
-                lethalIcons[2] = IsSpellKnown(POISON_IDS.AMPLIFYING) and POISON_IDS.AMPLIFYING or POISON_IDS.INSTANT
-            end
-        else
-            lethalIcons[1] = POISON_IDS.INSTANT
-        end
-
-        for i = 1, lethalMissing do
-            local iconSpellId = lethalIcons[i] or lethalIcons[1]
+    -- Check if food is missing
+    if foodSettings.Enabled ~= false and IsLoadConditionMet(foodSettings.LoadCondition) then
+        if not categorySatisfied["Food"] then
             missing[#missing + 1] = {
-                buff = { spellId = iconSpellId, text = "" },
+                buff = {
+                    spellId = 19705,
+                    text = "",
+                },
                 text = "",
-                isCustom = true,
             }
         end
     end
 
-    -- Add missing non-lethal poison entries with spec-specific icons
-    if nonLethalMissing > 0 then
-        local nonLethalIcons = {}
-        nonLethalIcons[1] = POISON_IDS.ATROPHIC
-        if hasDoublePoisonTalent then
-            nonLethalIcons[2] = POISON_IDS.CRIPPLING
-        end
-
-        for i = 1, nonLethalMissing do
-            local iconSpellId = nonLethalIcons[i] or nonLethalIcons[1]
-            missing[#missing + 1] = {
-                buff = { spellId = iconSpellId, text = "" },
-                text = "",
-                isCustom = true,
-            }
+    -- Create missing entries
+    local categorySeen = {}
+    for _, buff in ipairs(RESTRICTED_BUFFS) do
+        if buff.category and ShouldTrackBuff(buff) then
+            if not categorySatisfied[buff.category] and not categorySeen[buff.category] then
+                categorySeen[buff.category] = true
+                missing[#missing + 1] = {
+                    buff = {
+                        spellId = buff.spellId,
+                        text = "",
+                    },
+                    text = "",
+                }
+            end
         end
     end
 
     return missing
 end
 
--- General buff icon creation
+-- General buff icon creation and handling
 local function CreateIcon()
     local raidDb = MBUFFS.db.RaidBuffDisplay
     local iconFrame = NRSKNUI:CreateIconFrame(containerFrame, raidDb.IconSize)
     NRSKNUI:ApplyFontSettings(iconFrame, raidDb, nil)
     iconFrame.text:SetTextColor(1, 1, 1, 1)
+    iconFrame.text:SetPoint("CENTER", iconFrame, "CENTER", 0, 0)
     iconFrame:Hide()
     return iconFrame
 end
@@ -1126,84 +1177,40 @@ local function HideAllNotifications()
     end
 end
 
--- Check only weapon enchants
+-- Check only weapon enchants (for combat-safe checking)
 local function CheckWeaponEnchants()
     if not MBUFFS.db then return end
-    local consumablesDb = MBUFFS.db.Consumables or {}
     local raidDb = MBUFFS.db.RaidBuffDisplay or {}
-    for _, buff in ipairs(CUSTOM_BUFFS) do
-        if buff.weaponSlot and buff.category then
-            local dbKey = CATEGORY_TO_DB_KEY[buff.category]
-            local catSettings = dbKey and consumablesDb[dbKey]
-            local enabled = not catSettings or catSettings.Enabled ~= false
-            local loadMet = not catSettings or IsLoadConditionMet(catSettings.LoadCondition)
-            if enabled and loadMet then
-                local hasEnchant, icon, hasItem = HasWeaponEnchant(buff.weaponSlot)
-                if hasItem and not hasEnchant then
-                    local iconFrame = AcquireIcon()
-                    local displayIcon = icon or WEAPON_ENCHANT_ICON
-                    local text = buff.text or GENERALBUFF_TEXT
-                    local iconSize = raidDb.IconSize
 
-                    -- Set texture directly
-                    iconFrame.icon:SetTexture(displayIcon)
-                    iconFrame:SetSize(iconSize, iconSize)
-                    iconFrame.icon:SetSize(iconSize, iconSize)
-                    NRSKNUI:ApplyFontSettings(iconFrame, raidDb, nil)
-                    iconFrame.text:SetText(text)
-                    activeIcons[#activeIcons + 1] = iconFrame
-                    currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = text }
-                end
+    for _, buff in ipairs(SAFE_BUFFS) do
+        if buff.buffType == "weaponEnchant" and ShouldTrackBuff(buff) then
+            local hasEnchant, icon, hasItem = HasWeaponEnchant(buff.slot)
+            if hasItem and not hasEnchant then
+                local iconFrame = AcquireIcon()
+                local displayIcon = icon or WEAPON_ENCHANT_ICON
+                local text = buff.text or GENERALBUFF_TEXT
+                local iconSize = raidDb.IconSize
+
+                iconFrame.icon:SetTexture(displayIcon)
+                iconFrame:SetSize(iconSize, iconSize)
+                iconFrame.icon:SetSize(iconSize, iconSize)
+                NRSKNUI:ApplyFontSettings(iconFrame, raidDb, nil)
+                iconFrame.text:SetText(text)
+                activeIcons[#activeIcons + 1] = iconFrame
+                currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = text }
             end
         end
     end
 end
 
--- Check glow-based raid buffs
-local function CheckGlowBasedRaidBuffs()
-    local consumablesDb = MBUFFS.db.Consumables or {}
-    local raidBuffsSettings = consumablesDb.RaidBuffs or {}
-    local raidBuffsEnabled = raidBuffsSettings.Enabled ~= false
-    local raidBuffsLoadMet = IsLoadConditionMet(raidBuffsSettings.LoadCondition)
-    if playerBuffs and raidBuffsEnabled and raidBuffsLoadMet then
-        for _, buff in ipairs(playerBuffs) do
-            local spellToCheck = buff.spellbookId or buff.spellId
-            if IsSpellKnown(spellToCheck) then
-                if C_SpellActivationOverlay.IsSpellOverlayed(buff.spellId) then
-                    local iconFrame = AcquireIcon()
-                    UpdateIconAppearance(iconFrame, buff, GENERALBUFF_TEXT)
-                    activeIcons[#activeIcons + 1] = iconFrame
-                    currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = GENERALBUFF_TEXT }
-                end
-            end
-        end
-    end
-end
-
--- Check combat-safe elements
+-- Check combat-safe elements (weapon enchants and stances)
 local function CheckCombatSafeElements()
     if isPreviewActive then return end
     if not MBUFFS.db or not MBUFFS.db.Enabled then return end
     if UnitIsDeadOrGhost("player") or C_PetBattles.IsInBattle() then return end
     ReleaseAllIcons()
     wipe(currentMissingBuffs)
-    -- Check glow-based raid buffs if in M+ key
-    if C_ChallengeMode.IsChallengeModeActive() then
-        CheckGlowBasedRaidBuffs()
-    end
     -- Check weapon enchants and stances
-    CheckWeaponEnchants()
-    CheckStances()
-    ArrangeIcons()
-end
-
--- M+ Glow-Based Detection, used when in M+ outside of combat
--- TODO: Might need to revisit if not consistent enough
-local function CheckMissingBuffsViaGlow()
-    ReleaseAllIcons()
-    wipe(currentMissingBuffs)
-
-    CheckGlowBasedRaidBuffs()
     CheckWeaponEnchants()
     CheckStances()
     ArrangeIcons()
@@ -1218,11 +1225,6 @@ end
 local function CheckForMissingBuffs()
     -- Don't run checks when GUI or edit mode is open
     if IsTrackingPaused() then return end
-    -- If in keystone, use glow-based checking
-    if C_ChallengeMode.IsChallengeModeActive() then
-        CheckMissingBuffsViaGlow()
-        return
-    end
     -- Throttled checks
     local currentTime = GetTime()
     if currentTime - lastCheckTime < CHECK_THROTTLE then
@@ -1251,72 +1253,18 @@ local function CheckForMissingBuffs()
     end
 
     wipe(currentMissingBuffs)
-    -- Check custom buffs like flasks, food, weapon enchants, runes
-    local customMissing = CheckCustomBuffs()
-    for _, entry in ipairs(customMissing) do
+
+    -- Check SAFE_BUFFS
+    local safeMissing = CheckSafeBuffs()
+    for _, entry in ipairs(safeMissing) do
         currentMissingBuffs[#currentMissingBuffs + 1] = entry
     end
-    -- Check rogue poisons
-    local poisonMissing = CheckRoguePoisons()
-    for _, entry in ipairs(poisonMissing) do
+
+    -- Check RESTRICTED_BUFFS
+    -- Only runs when NOT in combat and NOT in M+
+    local restrictedMissing = CheckRestrictedBuffs()
+    for _, entry in ipairs(restrictedMissing) do
         currentMissingBuffs[#currentMissingBuffs + 1] = entry
-    end
-    -- Check class buffs like raid buffs like Intellect, Fortitude, etc
-    local consumablesDb = MBUFFS.db.Consumables or {}
-    local raidBuffsSettings = consumablesDb.RaidBuffs or {}
-    local raidBuffsEnabled = raidBuffsSettings.Enabled ~= false
-    local raidBuffsLoadMet = IsLoadConditionMet(raidBuffsSettings.LoadCondition)
-    if raidBuffsEnabled and raidBuffsLoadMet then
-        -- Track which buff spellIds we've already added to avoid duplicates
-        local addedBuffs = {}
-
-        -- First check player's own class buffs
-        if playerBuffs then
-            for _, buff in ipairs(playerBuffs) do
-                local spellToCheck = buff.spellbookId or buff.spellId
-                if IsSpellKnown(spellToCheck) then
-                    local specOk = true
-                    if buff.specIds then
-                        specOk = false
-                        local spec = GetSpecialization()
-                        if spec then
-                            local specId = GetSpecializationInfo(spec)
-                            for _, id in ipairs(buff.specIds) do
-                                if specId == id then
-                                    specOk = true
-                                    break
-                                end
-                            end
-                        end
-                    end
-                    -- Check if talent/spell requirement is met
-                    local talentOk = true
-                    if buff.requiresSpellKnown then
-                        talentOk = IsSpellKnown(buff.requiresSpellKnown)
-                    end
-                    if specOk and talentOk then
-                        local isMissing, needsReapply = CheckBuffStatus(buff)
-                        if isMissing then
-                            currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = GENERALBUFF_TEXT }
-                            addedBuffs[buff.spellId] = true
-                        elseif needsReapply then
-                            currentMissingBuffs[#currentMissingBuffs + 1] = { buff = buff, text = REAPPLY_TEXT }
-                            addedBuffs[buff.spellId] = true
-                        end
-                    end
-                end
-            end
-        end
-
-        -- Then check if player is missing buffs from other classes in the group
-        local groupMissing = CheckMissingRaidBuffsFromGroup()
-        for _, entry in ipairs(groupMissing) do
-            -- Only add if we haven't already added this buff
-            if not addedBuffs[entry.buff.spellId] then
-                currentMissingBuffs[#currentMissingBuffs + 1] = entry
-                addedBuffs[entry.buff.spellId] = true
-            end
-        end
     end
 
     -- Check stances/forms
@@ -1365,7 +1313,6 @@ function MBUFFS:OnInitialize()
     self:UpdateDB()
     local _, class = UnitClass("player")
     playerClass = class
-    playerBuffs = CLASS_BUFFS[class]
     self:SetEnabledState(false)
 end
 
@@ -1463,8 +1410,6 @@ function MBUFFS:OnEnable()
 
     -- M+ events
     self:RegisterEvent("CHALLENGE_MODE_START", function() C_Timer.After(1, CheckForMissingBuffs) end)
-    self:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", function() C_Timer.After(0.1, CheckForMissingBuffs) end)
-    self:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", function() C_Timer.After(0.1, CheckForMissingBuffs) end)
 
     C_Timer.After(2, CheckForMissingBuffs)
 
@@ -1674,6 +1619,12 @@ local function ShowPreviewIcons()
         { buff = { spellId = 1264426, text = "" },  text = "" },
         { buff = { spellId = 180608, text = "MH" }, text = "MH" },
         { buff = { spellId = 180608, text = "OH" }, text = "OH" },
+
+        -- Poisions
+        { buff = { spellId = POISON_IDS.ATROPHIC, text = "" },     text = "" },
+        { buff = { spellId = POISON_IDS.CRIPPLING, text = "" },  text = "" },
+        { buff = { spellId = POISON_IDS.AMPLIFYING, text = "" },   text = "" },
+        { buff = { spellId = POISON_IDS.DEADLY, text = "" },  text = "" },
     }
 
     wipe(currentMissingBuffs)
