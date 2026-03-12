@@ -142,6 +142,20 @@ function TT:OnInitialize()
     self:SetEnabledState(false)
 end
 
+-- Apply backdrop visual config (bgFile, edgeFile, colors) to a frame
+local function ApplyBackdropConfig(backdrop, db)
+    backdrop:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = db.BorderSize or 1,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 },
+    })
+    local bgColor = db.BackgroundColor or { 0, 0, 0, 0.8 }
+    local borderColor = db.BorderColor or { 0, 0, 0, 1 }
+    backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
+    backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
+end
+
 -- Get or create custom backdrop for a tooltip
 function TT:GetOrCreateBackdrop(tooltip)
     if tooltipBackdrops[tooltip] then
@@ -151,6 +165,13 @@ function TT:GetOrCreateBackdrop(tooltip)
     local backdrop = CreateFrame("Frame", nil, tooltip, "BackdropTemplate")
     local level = tooltip:GetFrameLevel()
     backdrop:SetFrameLevel(level > 0 and level - 1 or 0)
+
+    -- Apply backdrop BEFORE SetAllPoints so dimensions are 0x0 (safe).
+    -- WHITE8X8 is a solid pixel so UV coordinates don't matter visually.
+    if self.db then
+        ApplyBackdropConfig(backdrop, self.db)
+    end
+
     backdrop:SetAllPoints(tooltip)
     tooltipBackdrops[tooltip] = backdrop
     return backdrop
@@ -160,19 +181,14 @@ end
 function TT:UpdateBackdrop(backdrop)
     if not self.db then return end
 
-    -- Apply backdrop settings
-    backdrop:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = self.db.BorderSize or 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    })
+    -- Secret-value safety check on the parent tooltip's width
+    -- Setting the backdrop triggers math on width/height which crashes on tainted/secret values
+    local parent = backdrop:GetParent()
+    if parent and issecretvalue and issecretvalue(parent:GetWidth()) then
+        return
+    end
 
-    local bgColor = self.db.BackgroundColor or { 0, 0, 0, 0.8 }
-    local borderColor = self.db.BorderColor or { 0, 0, 0, 1 }
-
-    backdrop:SetBackdropColor(bgColor[1], bgColor[2], bgColor[3], bgColor[4] or 0.8)
-    backdrop:SetBackdropBorderColor(borderColor[1], borderColor[2], borderColor[3], borderColor[4] or 1)
+    ApplyBackdropConfig(backdrop, self.db)
 end
 
 -- Fetch color info from unit if unit is a player
@@ -386,8 +402,6 @@ function TT:StyleTooltip(tooltip, unit)
                 nameLine:SetTextColor(1, 1, 1, 1)
             end
         end
-        -- Show the backdrop
-        backdrop:Show()
     end
     -- Permanently hide health bars if enabled
     TT:HideHealthBars(tooltip)
@@ -531,23 +545,13 @@ function TT:HookTooltip(tooltip)
     if hookedTooltips[tooltip] then return end
     if not self.db.Enabled then return end
     -- Hook OnShow for backdrop setup
+    -- No explicit Show/Hide needed: backdrop is a child frame and automatically
+    -- follows parent visibility without firing OnShow (avoiding SetupTextureCoordinates crash)
     tooltip:HookScript("OnShow", function(self)
-        -- Hide default elements
         TT:HideNineSlice(self)
         TT:HideHealthBars(self)
-
-        -- Setup backdrop
         local backdrop = TT:GetOrCreateBackdrop(self)
         TT:UpdateBackdrop(backdrop)
-        backdrop:Show()
-    end)
-
-    -- Hook OnHide to hide our backdrop
-    tooltip:HookScript("OnHide", function(self)
-        local backdrop = tooltipBackdrops[self]
-        if backdrop then
-            backdrop:Hide()
-        end
     end)
     hookedTooltips[tooltip] = true
 end
