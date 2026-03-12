@@ -55,6 +55,40 @@ function REC:UpdateAlpha()
     self.button:SetAlpha(alpha)
 end
 
+-- Build visibility macro string based on load settings
+function REC:GetVisibilityString()
+    local loadInRaid = self.db.LoadInRaid
+    local loadInParty = self.db.LoadInParty
+
+    -- Neither enabled - always hide
+    if not loadInRaid and not loadInParty then
+        return "hide"
+    end
+
+    -- Both enabled - show in any group
+    if loadInRaid and loadInParty then
+        return "[combat] hide; [nogroup] hide; [dead] hide; show"
+    end
+
+    -- Only raid - hide if not in raid
+    if loadInRaid then
+        return "[combat] hide; [nogroup:raid] hide; [dead] hide; show"
+    end
+
+    -- Only party - hide in raid, hide if no group
+    return "[combat] hide; [group:raid] hide; [nogroup] hide; [dead] hide; show"
+end
+
+-- Update the state driver (called when settings change)
+function REC:UpdateStateDriver()
+    if not self.button then return end
+    if self.isPreview then return end
+
+    UnregisterStateDriver(self.button, "visibility")
+    RegisterStateDriver(self.button, "visibility", self:GetVisibilityString())
+    self:UpdateAlpha()
+end
+
 -- Create the button
 function REC:CreateButton()
     if self.button then return end
@@ -66,7 +100,7 @@ function REC:CreateButton()
     button:Hide()
 
     -- Register state driver for visibility
-    RegisterStateDriver(button, "visibility", "[combat] hide; [nogroup:raid] hide; [dead] hide; show")
+    RegisterStateDriver(button, "visibility", self:GetVisibilityString())
 
     -- Set up spell casting
     button:RegisterForClicks("AnyUp", "AnyDown")
@@ -113,6 +147,7 @@ function REC:OnEnable()
     -- Event reg
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAlpha")
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateAlpha")
+    self:RegisterEvent("GROUP_ROSTER_UPDATE", "UpdateAlpha")
     self:RegisterEvent("UNIT_HEALTH", "OnHealthChange")
     self:UpdateAlpha()
 
@@ -156,9 +191,7 @@ function REC:HidePreview()
     self.isPreview = false
     if not self.button then return end
     if self.db.Enabled then
-        RegisterStateDriver(self.button, "visibility",
-            "[combat] hide; [nogroup:raid] hide; [dead] hide; show")
-
+        RegisterStateDriver(self.button, "visibility", self:GetVisibilityString())
         self:UpdateAlpha()
     else
         self.button:Hide()

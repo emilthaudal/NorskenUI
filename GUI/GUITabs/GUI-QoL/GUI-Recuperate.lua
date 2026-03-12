@@ -59,7 +59,7 @@ GUIFrame:RegisterContent("Recuperate", function(scrollChild, yOffset)
     ----------------------------------------------------------------
     local card1 = GUIFrame:CreateCard(scrollChild, "Recuperate Button", yOffset)
 
-    local row1 = GUIFrame:CreateRow(card1.content, 36)
+    local row1 = GUIFrame:CreateRow(card1.content, 40)
     local enableCheck = GUIFrame:CreateCheckbox(row1, "Enable Recuperate Button", db.Enabled ~= false,
         function(checked)
             db.Enabled = checked
@@ -69,7 +69,30 @@ GUIFrame:RegisterContent("Recuperate", function(scrollChild, yOffset)
         true, "Recuperate Button", "On", "Off"
     )
     row1:AddWidget(enableCheck, 1)
-    card1:AddRow(row1, 36)
+    card1:AddRow(row1, 40)
+
+    -- Load conditions row
+    local row1b = GUIFrame:CreateRow(card1.content, 36)
+    local loadInRaidCheck = GUIFrame:CreateCheckbox(row1b, "Load in Raid", db.LoadInRaid ~= false,
+        function(checked)
+            db.LoadInRaid = checked
+            if REC then REC:UpdateStateDriver() end
+        end,
+        true, "Load in Raid", "On", "Off"
+    )
+    row1b:AddWidget(loadInRaidCheck, 0.5)
+    table_insert(allWidgets, loadInRaidCheck)
+
+    local loadInPartyCheck = GUIFrame:CreateCheckbox(row1b, "Load in Party", db.LoadInParty == true,
+        function(checked)
+            db.LoadInParty = checked
+            if REC then REC:UpdateStateDriver() end
+        end,
+        true, "Load in Party", "On", "Off"
+    )
+    row1b:AddWidget(loadInPartyCheck, 0.5)
+    table_insert(allWidgets, loadInPartyCheck)
+    card1:AddRow(row1b, 36)
 
     yOffset = yOffset + card1:GetContentHeight() + Theme.paddingSmall
 
